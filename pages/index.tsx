@@ -1,7 +1,8 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import type { NextPage } from 'next';
 
-export default function Home() {
+const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
@@ -15,7 +16,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
+          Get started by editing <code>pages/index.tsx</code>
         </p>
 
         <div className={styles.grid}>
@@ -128,4 +129,6 @@ export default function Home() {
       `}</style>
     </div>
   );
-}
+};
+
+export default Home;
