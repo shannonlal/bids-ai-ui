@@ -1,10 +1,7 @@
 import React from 'react';
 import { IconProps } from './types';
 
-export const IconError: React.FC<IconProps> = ({
-  size = 80,
-  ...nativeProps
-}) => {
+export const IconError: React.FC<IconProps> = ({ size = 80, ...nativeProps }) => {
   return (
     <svg
       width={size}

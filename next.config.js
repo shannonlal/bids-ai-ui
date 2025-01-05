@@ -9,7 +9,7 @@ const nextConfig = {
     // !! WARN !!
     ignoreBuildErrors: false,
   },
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx']
-}
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
