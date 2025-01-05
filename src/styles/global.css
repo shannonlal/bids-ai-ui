@@ -1,32 +1,37 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    Segoe UI,
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    Fira Sans,
-    Droid Sans,
-    Helvetica Neue,
-    sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+@layer components {
+  /* Button Styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-button font-medium transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-hover;
+  }
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-secondary-hover;
+  }
 
-* {
-  box-sizing: border-box;
-}
+  /* Dropdown Styles */
+  .dropdown {
+    @apply relative inline-block;
+  }
+  .dropdown-content {
+    @apply absolute z-50 mt-2 w-56 rounded-dropdown bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none;
+  }
+  .dropdown-item {
+    @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer;
+  }
 
-img {
-  max-width: 100%;
-  height: auto;
+  /* Input Styles */
+  .input {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm;
+  }
+
+  /* Card Styles */
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
 }
