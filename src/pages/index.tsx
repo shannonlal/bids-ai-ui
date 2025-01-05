@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Button } from '../components/Button';
-import { Dropdown } from '../components/Dropdown';
+import { Button } from '../ui-kit/Button';
+import { Dropdown } from '../ui-kit/Dropdown';
 
 const Home: NextPage = () => {
   return (
