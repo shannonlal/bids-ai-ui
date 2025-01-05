@@ -25,10 +25,8 @@ export const Dropdown: React.FC<DropdownProps> = ({ trigger, items }) => {
 
   return (
     <div className="dropdown" ref={dropdownRef}>
-      <div onClick={() => setIsOpen(!isOpen)}>
-        {trigger}
-      </div>
-      
+      <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
+
       {isOpen && (
         <div className="dropdown-content">
           {items.map((item, index) => (

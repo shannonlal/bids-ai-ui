@@ -13,9 +13,7 @@ const Home: NextPage = () => {
 
       <div className="max-w-3xl mx-auto">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            Tailwind Components Demo
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Tailwind Components Demo</h1>
 
           <div className="space-y-8">
             {/* Buttons Section */}
@@ -31,11 +29,7 @@ const Home: NextPage = () => {
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Dropdown</h2>
               <Dropdown
-                trigger={
-                  <Button variant="secondary">
-                    Open Dropdown
-                  </Button>
-                }
+                trigger={<Button variant="secondary">Open Dropdown</Button>}
                 items={[
                   {
                     label: 'Profile',
@@ -56,11 +50,7 @@ const Home: NextPage = () => {
             {/* Input Section */}
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Input</h2>
-              <input
-                type="text"
-                placeholder="Type something..."
-                className="input"
-              />
+              <input type="text" placeholder="Type something..." className="input" />
             </div>
           </div>
         </div>
