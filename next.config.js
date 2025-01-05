@@ -9,6 +9,7 @@ const nextConfig = {
     // !! WARN !!
     ignoreBuildErrors: false,
   },
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx']
 }
 
 module.exports = nextConfig
