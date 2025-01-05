@@ -16,7 +16,7 @@ const Home: NextPage = () => {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing <code>pages/index.tsx</code>
+          Get started by editing <code>src/pages/index.tsx</code>
         </p>
 
         <div className={styles.grid}>
