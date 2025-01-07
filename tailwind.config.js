@@ -10,8 +10,8 @@ module.exports = {
       // Custom button styles
       colors: {
         primary: {
-          DEFAULT: '#3B82F6',
-          hover: '#2563EB',
+          DEFAULT: '#4EADFF',
+          hover: '#3B9EF3',
         },
         secondary: {
           DEFAULT: '#6B7280',
