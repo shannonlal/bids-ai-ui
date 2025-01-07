@@ -3,3 +3,6 @@
 
 echo "Running formatter and linter before commit"
 pnpm exec lint-staged --relative
+
+echo "Running unit tests before commit"
+pnpm test
