@@ -2,6 +2,7 @@ import Head from 'next/head';
 import type { NextPage } from 'next';
 import { Button } from '../ui-kit/Button';
 import { Dropdown } from '../ui-kit/Dropdown';
+import { IconPlus } from '../ui-kit/icons/IconPlus';
 
 const Home: NextPage = () => {
   return (
@@ -20,8 +21,8 @@ const Home: NextPage = () => {
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Buttons</h2>
               <div className="space-x-4">
-                <Button>Primary Button</Button>
-                <Button variant="secondary">Secondary Button</Button>
+                <Button icon={<IconPlus />}>Create New</Button>
+                <Button>SEE MORE</Button>
               </div>
             </div>
 

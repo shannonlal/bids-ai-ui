@@ -5,10 +5,10 @@
 @layer components {
   /* Button Styles */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-button font-medium transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-full font-medium transition-colors duration-200;
   }
   .btn-primary {
-    @apply btn bg-primary text-white hover:bg-primary-hover;
+    @apply btn bg-primary text-white hover:bg-primary-hover shadow-sm;
   }
   .btn-secondary {
     @apply btn bg-secondary text-white hover:bg-secondary-hover;
