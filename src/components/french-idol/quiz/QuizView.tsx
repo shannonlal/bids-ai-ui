@@ -1,8 +1,11 @@
 import React from 'react';
 import { useQuiz } from './QuizContext';
+import { Button } from '../../../ui-kit/Button';
+import { useFrenchIdol } from '../FrenchIdolContext';
 
 export const QuizView: React.FC = () => {
   const { currentQuestion, score } = useQuiz();
+  const { setDisplayStoryUpload } = useFrenchIdol();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
@@ -15,6 +18,9 @@ export const QuizView: React.FC = () => {
         <div className="flex justify-between items-center text-sm text-gray-500">
           <span>Question {currentQuestion + 1}</span>
           <span>Score: {score}</span>
+        </div>
+        <div className="mt-6 flex justify-center">
+          <Button onClick={() => setDisplayStoryUpload(true)}>Start Again</Button>
         </div>
       </div>
     </div>
