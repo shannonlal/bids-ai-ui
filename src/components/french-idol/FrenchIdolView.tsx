@@ -1,5 +1,7 @@
 import { useFrenchIdol } from './FrenchIdolContext';
 import { StoryUpload } from './StoryUpload';
+import { QuizView } from './quiz/QuizView';
+import { QuizProvider } from './quiz/QuizContext';
 
 export function FrenchIdolView() {
   const { displayStoryUpload } = useFrenchIdol();
@@ -11,7 +13,9 @@ export function FrenchIdolView() {
         {displayStoryUpload ? (
           <StoryUpload />
         ) : (
-          <div className="text-center text-gray-600">Loading...</div>
+          <QuizProvider>
+            <QuizView />
+          </QuizProvider>
         )}
       </div>
     </div>

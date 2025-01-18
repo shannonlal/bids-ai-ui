@@ -7,7 +7,7 @@ import { cn } from '../../ui-kit/utils/cn';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export function StoryUpload() {
-  const { displayStoryUpload } = useFrenchIdol();
+  const { displayStoryUpload, setDisplayStoryUpload } = useFrenchIdol();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +73,7 @@ export function StoryUpload() {
 
         <Button
           onClick={() => {
+            setDisplayStoryUpload(false);
             // TODO: Implement file processing (US-3)
             console.log('Processing file:', file);
           }}

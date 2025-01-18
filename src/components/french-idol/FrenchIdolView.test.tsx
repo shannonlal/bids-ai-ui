@@ -28,8 +28,10 @@ describe('FrenchIdolView', () => {
     expect(screen.getByText('Upload your French PDF story')).toBeInTheDocument();
   });
 
-  it('renders loading state when displayStoryUpload is false', () => {
+  it('renders QuizView when displayStoryUpload is false', () => {
     renderWithProvider(false);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('French Idol Quiz')).toBeInTheDocument();
+    expect(screen.getByText('Question 1')).toBeInTheDocument();
+    expect(screen.getByText('Score: 0')).toBeInTheDocument();
   });
 });
