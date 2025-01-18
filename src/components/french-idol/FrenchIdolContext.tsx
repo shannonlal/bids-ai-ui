@@ -12,7 +12,7 @@ const defaultContext: FrenchIdolContextType = {
   },
 };
 
-const FrenchIdolContext = createContext<FrenchIdolContextType>(defaultContext);
+export const FrenchIdolContext = createContext<FrenchIdolContextType>(defaultContext);
 
 interface FrenchIdolProviderProps {
   children: ReactNode;
