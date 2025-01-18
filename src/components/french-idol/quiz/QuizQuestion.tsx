@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { TextInput } from '../../../ui-kit/TextInput';
 import { Button } from '../../../ui-kit/Button';
+import { useValidResponse } from '../../../hooks/useValidResponse';
 
 interface QuizQuestionProps {
   question: string;
-  onSubmit: (answer: string) => void;
-  error?: string;
-  grade?: number;
 }
 
-export const QuizQuestion: React.FC<QuizQuestionProps> = ({ question, onSubmit, error, grade }) => {
+export const QuizQuestion: React.FC<QuizQuestionProps> = ({ question }) => {
   const [answer, setAnswer] = useState('');
+  const [error, setError] = useState<string>();
+  const [grade, setGrade] = useState<number>();
+  const { validateResponse, isValidating } = useValidResponse();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (answer.trim()) {
-      onSubmit(answer);
+      const result = await validateResponse(question, answer);
+      setError(result.errorMessage);
+      setGrade(result.grade);
       setAnswer('');
     }
   };
@@ -49,7 +52,9 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({ question, onSubmit, 
           </div>
         )}
       </div>
-      <Button onClick={handleSubmit}>Submit</Button>
+      <Button onClick={handleSubmit} disabled={isValidating}>
+        {isValidating ? 'Validating...' : 'Submit'}
+      </Button>
     </div>
   );
 };
