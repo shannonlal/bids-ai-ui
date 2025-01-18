@@ -9,7 +9,14 @@ import { FrenchIdolContext } from '../FrenchIdolContext';
 describe('QuizView', () => {
   const renderQuizView = (setDisplayStoryUpload = vi.fn()) => {
     return render(
-      <FrenchIdolContext.Provider value={{ displayStoryUpload: false, setDisplayStoryUpload }}>
+      <FrenchIdolContext.Provider
+        value={{
+          displayStoryUpload: false,
+          storyText: 'Test story',
+          setDisplayStoryUpload,
+          setStoryText: vi.fn(),
+        }}
+      >
         <QuizProvider>
           <QuizView />
         </QuizProvider>
@@ -36,5 +43,10 @@ describe('QuizView', () => {
     const startAgainButton = screen.getByText('Start Again');
     await userEvent.click(startAgainButton);
     expect(setDisplayStoryUpload).toHaveBeenCalledWith(true);
+  });
+
+  it('renders QuizStory component', () => {
+    renderQuizView();
+    expect(screen.getByPlaceholderText('Enter your story here...')).toBeInTheDocument();
   });
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuiz } from './QuizContext';
 import { Button } from '../../../ui-kit/Button';
 import { useFrenchIdol } from '../FrenchIdolContext';
+import { QuizStory } from './QuizStory';
 
 export const QuizView: React.FC = () => {
   const { currentQuestion, score } = useQuiz();
@@ -19,7 +20,10 @@ export const QuizView: React.FC = () => {
           <span>Question {currentQuestion + 1}</span>
           <span>Score: {score}</span>
         </div>
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 mb-6">
+          <QuizStory />
+        </div>
+        <div className="flex justify-center">
           <Button onClick={() => setDisplayStoryUpload(true)}>Start Again</Button>
         </div>
       </div>

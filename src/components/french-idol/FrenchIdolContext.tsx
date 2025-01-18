@@ -2,12 +2,18 @@ import { createContext, useContext, ReactNode, useState } from 'react';
 
 interface FrenchIdolContextType {
   displayStoryUpload: boolean;
+  storyText: string;
   setDisplayStoryUpload: (display: boolean) => void;
+  setStoryText: (text: string) => void;
 }
 
 const defaultContext: FrenchIdolContextType = {
   displayStoryUpload: true,
+  storyText: '',
   setDisplayStoryUpload: () => {
+    throw new Error('FrenchIdolContext not initialized');
+  },
+  setStoryText: () => {
     throw new Error('FrenchIdolContext not initialized');
   },
 };
@@ -20,10 +26,13 @@ interface FrenchIdolProviderProps {
 
 export function FrenchIdolProvider({ children }: FrenchIdolProviderProps) {
   const [displayStoryUpload, setDisplayStoryUpload] = useState(true);
+  const [storyText, setStoryText] = useState('');
 
   const value = {
     displayStoryUpload,
+    storyText,
     setDisplayStoryUpload,
+    setStoryText,
   };
 
   return <FrenchIdolContext.Provider value={value}>{children}</FrenchIdolContext.Provider>;

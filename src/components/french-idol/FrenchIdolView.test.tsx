@@ -8,7 +8,9 @@ describe('FrenchIdolView', () => {
   const renderWithProvider = (displayStoryUpload: boolean) => {
     const mockContextValue = {
       displayStoryUpload,
+      storyText: '',
       setDisplayStoryUpload: () => {},
+      setStoryText: () => {},
     };
 
     return render(

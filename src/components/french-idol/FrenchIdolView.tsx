@@ -4,7 +4,7 @@ import { QuizView } from './quiz/QuizView';
 import { QuizProvider } from './quiz/QuizContext';
 
 export function FrenchIdolView() {
-  const { displayStoryUpload } = useFrenchIdol();
+  const { displayStoryUpload, storyText } = useFrenchIdol();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -13,7 +13,7 @@ export function FrenchIdolView() {
         {displayStoryUpload ? (
           <StoryUpload />
         ) : (
-          <QuizProvider>
+          <QuizProvider initialStoryText={storyText}>
             <QuizView />
           </QuizProvider>
         )}

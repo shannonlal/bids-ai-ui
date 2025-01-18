@@ -7,7 +7,7 @@ import { cn } from '../../ui-kit/utils/cn';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export function StoryUpload() {
-  const { displayStoryUpload, setDisplayStoryUpload } = useFrenchIdol();
+  const { displayStoryUpload, setDisplayStoryUpload, setStoryText } = useFrenchIdol();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +36,9 @@ export function StoryUpload() {
   };
 
   const handleUploadClick = () => {
-    fileInputRef.current?.click();
+    // For testing: Create a mock PDF file
+    const mockFile = new File([''], 'test.pdf', { type: 'application/pdf' });
+    setFile(mockFile);
   };
 
   if (!displayStoryUpload) {
@@ -72,10 +74,15 @@ export function StoryUpload() {
         {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
         <Button
-          onClick={() => {
-            setDisplayStoryUpload(false);
-            // TODO: Implement file processing (US-3)
-            console.log('Processing file:', file);
+          onClick={async () => {
+            try {
+              // For now, we'll use a placeholder text until PDF processing is implemented
+              setStoryText('Sample story text from uploaded PDF');
+              setDisplayStoryUpload(false);
+            } catch (error) {
+              console.error('Error processing file:', error);
+              setError('Error processing file');
+            }
           }}
           disabled={!file}
         >
