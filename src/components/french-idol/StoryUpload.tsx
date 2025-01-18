@@ -1,4 +1,5 @@
 import { useState, useRef, ChangeEvent } from 'react';
+import { useFrenchIdol } from './FrenchIdolContext';
 import { Button } from '../../ui-kit/Button';
 import { IconDownload } from '../../ui-kit/icons/IconDownload';
 import { cn } from '../../ui-kit/utils/cn';
@@ -6,6 +7,7 @@ import { cn } from '../../ui-kit/utils/cn';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export function StoryUpload() {
+  const { displayStoryUpload } = useFrenchIdol();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,6 +38,10 @@ export function StoryUpload() {
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
+
+  if (!displayStoryUpload) {
+    return null;
+  }
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
