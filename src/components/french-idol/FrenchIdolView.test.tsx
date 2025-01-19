@@ -4,6 +4,41 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { FrenchIdolView } from './FrenchIdolView';
 import { FrenchIdolContext } from './FrenchIdolContext';
 import { QuizProvider } from './quiz/QuizContext';
+import { usePdfParser } from '../../hooks/usePdfParser';
+
+type DynamicImportFn = () => Promise<{
+  usePdfParser: typeof import('../../hooks/usePdfParser').usePdfParser;
+}>;
+
+interface PDFParserChildrenProps {
+  parsePdf: (file: File) => Promise<string>;
+  isLoading: boolean;
+  error: string | null;
+}
+
+interface PDFParserProps {
+  children: (props: PDFParserChildrenProps) => React.ReactElement;
+}
+
+// Mock next/dynamic
+vi.mock('next/dynamic', () => ({
+  default: (_importFn: DynamicImportFn) => {
+    const Component = ({ children }: PDFParserProps) => {
+      const hookResult = usePdfParser();
+      return children(hookResult);
+    };
+    return Component;
+  },
+}));
+
+// Mock the PDF parser hook
+vi.mock('../../hooks/usePdfParser', () => ({
+  usePdfParser: vi.fn().mockReturnValue({
+    parsePdf: vi.fn(),
+    isLoading: false,
+    error: null,
+  }),
+}));
 vi.mock('../../hooks/useDetermineQuestions', () => ({
   determineQuestions: vi.fn().mockResolvedValue(['Test question']),
 }));
