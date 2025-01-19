@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput } from '../../../ui-kit/TextInput';
 import { Button } from '../../../ui-kit/Button';
 import { useValidResponse } from '../../../hooks/useValidResponse';
@@ -15,18 +15,39 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
   onAnswered,
 }) => {
   const [answer, setAnswer] = useState('');
-  const [error, setError] = useState<string>();
-  const [grade, setGrade] = useState<number>();
+  const [error, setError] = useState<string>('');
+  const [grade, setGrade] = useState<number | null>(null);
+
+  // Reset states when question changes
+  useEffect(() => {
+    setError('');
+    setGrade(null);
+    setAnswer('');
+  }, [question]);
   const { validateResponse, isValidating } = useValidResponse();
 
   const handleSubmit = async () => {
-    if (answer.trim()) {
+    if (!answer.trim()) {
+      setError('Please enter an answer');
+      return;
+    }
+
+    try {
+      setError('');
       const result = await validateResponse(question, answer);
-      setError(result.errorMessage);
+      if (result.errorMessage) {
+        setError(result.errorMessage);
+        return;
+      }
+
       const questionGrade = result.grade || 0;
       setGrade(questionGrade);
-      setAnswer('');
       onAnswered(questionIndex, questionGrade);
+      setAnswer('');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'An error occurred while validating your answer'
+      );
     }
   };
 
@@ -54,11 +75,11 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
           />
           {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
         </div>
-        {grade !== undefined && (
-          <div className="flex items-center">
-            <span className="text-lg font-medium text-gray-600">{grade}/5</span>
-          </div>
-        )}
+        <div className="flex items-center">
+          <span className="text-lg font-medium text-gray-600">
+            {grade !== null ? `${grade}/5` : '/5'}
+          </span>
+        </div>
       </div>
       <Button onClick={handleSubmit} disabled={isValidating}>
         {isValidating ? 'Validating...' : 'Submit'}

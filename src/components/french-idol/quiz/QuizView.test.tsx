@@ -6,7 +6,7 @@ import { QuizView } from './QuizView';
 import { QuizProvider, QuizContext } from './QuizContext';
 import { FrenchIdolContext } from '../FrenchIdolContext';
 vi.mock('../../../hooks/useDetermineQuestions', () => ({
-  useDetermineQuestions: vi.fn().mockResolvedValue([]),
+  determineQuestions: vi.fn().mockResolvedValue(['Test question']),
 }));
 
 describe('QuizView', () => {
@@ -24,8 +24,17 @@ describe('QuizView', () => {
           setStoryText: vi.fn(),
         }}
       >
-        <QuizProvider>
-          <QuizView />
+        <QuizProvider initialStoryText="Test story">
+          <QuizContext.Consumer>
+            {value => {
+              if (!value) return null;
+              // Set up initial quiz state
+              setTimeout(() => {
+                value.setQuestions(['Test question']);
+              }, 0);
+              return <QuizView />;
+            }}
+          </QuizContext.Consumer>
         </QuizProvider>
       </FrenchIdolContext.Provider>
     );
@@ -59,11 +68,14 @@ describe('QuizView', () => {
     );
   };
 
-  it('renders quiz view with initial state', () => {
+  it('renders quiz view with initial state', async () => {
     renderQuizView();
 
     expect(screen.getByText('French Idol Quiz')).toBeInTheDocument();
-    expect(screen.getByText('Question 1')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Question 1 of 1')).toBeInTheDocument();
+    });
+    expect(screen.getByText('(0 answered)')).toBeInTheDocument();
     expect(screen.getByText('Score: 0')).toBeInTheDocument();
     expect(
       screen.getByText(

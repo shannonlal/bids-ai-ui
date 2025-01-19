@@ -6,7 +6,14 @@ import { QuizStory } from './QuizStory';
 import { QuizQuestion } from './QuizQuestion';
 
 export const QuizView: React.FC = () => {
-  const { currentQuestion, score, questions, hasMoreQuestions, markQuestionAnswered } = useQuiz();
+  const {
+    currentQuestion,
+    score,
+    questions,
+    hasMoreQuestions,
+    markQuestionAnswered,
+    answeredQuestions,
+  } = useQuiz();
   const { setDisplayStoryUpload } = useFrenchIdol();
 
   return (
@@ -18,7 +25,12 @@ export const QuizView: React.FC = () => {
           skills.
         </p>
         <div className="flex justify-between items-center text-sm text-gray-500">
-          <span>Question {currentQuestion + 1}</span>
+          <div>
+            <span>
+              Question {currentQuestion + 1} of {questions.length}
+            </span>
+            <span className="ml-2">({answeredQuestions.length} answered)</span>
+          </div>
           <span>Score: {score}</span>
         </div>
         <div className="mt-6 mb-6">

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { useDetermineQuestions } from './useDetermineQuestions';
+import { determineQuestions } from './useDetermineQuestions';
 
-describe('useDetermineQuestions', () => {
+describe('determineQuestions', () => {
   it('should return an array of questions', async () => {
     const storyText = 'This is a sample story';
-    const questions = await useDetermineQuestions(storyText);
+    const questions = await determineQuestions(storyText);
 
     expect(Array.isArray(questions)).toBe(true);
     expect(questions.length).toBeGreaterThanOrEqual(1);
@@ -14,9 +14,9 @@ describe('useDetermineQuestions', () => {
   it('should return different number of questions on multiple calls', async () => {
     const storyText = 'This is a sample story';
     const results = await Promise.all([
-      useDetermineQuestions(storyText),
-      useDetermineQuestions(storyText),
-      useDetermineQuestions(storyText),
+      determineQuestions(storyText),
+      determineQuestions(storyText),
+      determineQuestions(storyText),
     ]);
 
     // Check if at least two arrays have different lengths
@@ -26,7 +26,7 @@ describe('useDetermineQuestions', () => {
 
   it('should return string questions', async () => {
     const storyText = 'This is a sample story';
-    const questions = await useDetermineQuestions(storyText);
+    const questions = await determineQuestions(storyText);
 
     questions.forEach(question => {
       expect(typeof question).toBe('string');

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { TextArea } from '../../../ui-kit/TextArea';
 import { useQuiz } from './QuizContext';
-import { useDetermineQuestions as determineQuestions } from '../../../hooks/useDetermineQuestions';
+import { determineQuestions } from '../../../hooks/useDetermineQuestions';
 
 export const QuizStory: React.FC = () => {
   const { storyText, setStoryText, setQuestions } = useQuiz();

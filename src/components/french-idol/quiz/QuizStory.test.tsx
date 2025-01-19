@@ -6,7 +6,7 @@ import { QuizProvider, useQuiz } from './QuizContext';
 import * as determineQuestionsModule from '../../../hooks/useDetermineQuestions';
 
 vi.mock('../../../hooks/useDetermineQuestions', () => ({
-  useDetermineQuestions: vi
+  determineQuestions: vi
     .fn()
     .mockImplementation(async () => ['Test question 1', 'Test question 2']),
 }));
@@ -16,7 +16,7 @@ describe('QuizStory', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(determineQuestionsModule.useDetermineQuestions).mockResolvedValue([
+    vi.mocked(determineQuestionsModule.determineQuestions).mockResolvedValue([
       'Test question 1',
       'Test question 2',
     ]);
@@ -44,7 +44,7 @@ describe('QuizStory', () => {
     fireEvent.change(textarea, { target: { value: 'Test story' } });
     expect(textarea).toHaveValue('Test story');
     await waitFor(() => {
-      expect(determineQuestionsModule.useDetermineQuestions).toHaveBeenCalledWith('Test story');
+      expect(determineQuestionsModule.determineQuestions).toHaveBeenCalledWith('Test story');
     });
   });
 
@@ -66,7 +66,7 @@ describe('QuizStory', () => {
 
     await waitFor(
       () => {
-        expect(determineQuestionsModule.useDetermineQuestions).toHaveBeenCalledWith('Test story');
+        expect(determineQuestionsModule.determineQuestions).toHaveBeenCalledWith('Test story');
         const questionsElement = screen.getByTestId('questions');
         expect(questionsElement.textContent).toBe(JSON.stringify(mockQuestions));
       },
