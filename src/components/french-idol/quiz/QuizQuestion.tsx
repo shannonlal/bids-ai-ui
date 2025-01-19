@@ -35,10 +35,10 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
     try {
       setError('');
       const result = await validateResponse(question, answer);
-      if (result.errorMessage) {
-        setError(result.errorMessage);
-        return;
-      }
+      // if (result.errorMessage) {
+      //   setError(result.errorMessage);
+      //   return;
+      // }
 
       const questionGrade = result.grade || 0;
       setGrade(questionGrade);

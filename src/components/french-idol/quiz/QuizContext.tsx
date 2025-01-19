@@ -57,11 +57,12 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   }, [storyText]);
 
   const markQuestionAnswered = (questionIndex: number, grade: number) => {
-    if (answeredQuestions.includes(questionIndex)) {
-      return; // Prevent answering the same question multiple times
-    }
-
-    setAnsweredQuestions(prev => [...prev, questionIndex]);
+    setAnsweredQuestions(prev => {
+      if (prev.includes(questionIndex)) {
+        return prev; // Prevent answering the same question multiple times
+      }
+      return [...prev, questionIndex];
+    });
     setScore(prev => prev + grade);
 
     // Move to next question if available
