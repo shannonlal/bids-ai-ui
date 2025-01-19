@@ -4,9 +4,11 @@ interface QuizContextType {
   currentQuestion: number;
   score: number;
   storyText: string;
+  questions: string[];
   setCurrentQuestion: (question: number) => void;
   setScore: (score: number) => void;
   setStoryText: (text: string) => void;
+  setQuestions: (questions: string[]) => void;
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -20,14 +22,17 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [storyText, setStoryText] = useState(initialStoryText);
+  const [questions, setQuestions] = useState<string[]>([]);
 
   const value = {
     currentQuestion,
     score,
     storyText,
+    questions,
     setCurrentQuestion,
     setScore,
     setStoryText,
+    setQuestions,
   };
 
   return <QuizContext.Provider value={value}>{children}</QuizContext.Provider>;

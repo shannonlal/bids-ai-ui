@@ -1,6 +1,6 @@
 export const useDetermineQuestions = async (_storyText: string): Promise<string[]> => {
-  // Generate random number between 1-5
-  const numQuestions = Math.floor(Math.random() * 5) + 1;
+  // Generate random number between 2-5 to ensure more variance
+  const numQuestions = Math.floor(Math.random() * 4) + 2;
 
   // Placeholder questions
   const placeholderQuestions = [
