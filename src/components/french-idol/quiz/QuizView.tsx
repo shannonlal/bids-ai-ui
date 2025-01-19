@@ -4,6 +4,7 @@ import { Button } from '../../../ui-kit/Button';
 import { useFrenchIdol } from '../FrenchIdolContext';
 import { QuizStory } from './QuizStory';
 import { QuizQuestion } from './QuizQuestion';
+import { QuizResults } from './QuizResults';
 
 export const QuizView: React.FC = () => {
   const {
@@ -13,6 +14,7 @@ export const QuizView: React.FC = () => {
     hasMoreQuestions,
     markQuestionAnswered,
     answeredQuestions,
+    questionScores,
   } = useQuiz();
   const { setDisplayStoryUpload } = useFrenchIdol();
 
@@ -45,12 +47,16 @@ export const QuizView: React.FC = () => {
                 onAnswered={markQuestionAnswered}
               />
             ) : (
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
-                <p className="text-gray-600 mb-6">
-                  Final Score: {score}/{questions.length * 5}
-                </p>
-                <Button onClick={() => setDisplayStoryUpload(true)}>Start Again</Button>
+              <div className="space-y-6">
+                <QuizResults
+                  results={questions.map((question, index) => ({
+                    question,
+                    score: questionScores[index] || 0,
+                  }))}
+                />
+                <div className="text-center">
+                  <Button onClick={() => setDisplayStoryUpload(true)}>Start Again</Button>
+                </div>
               </div>
             )}
           </div>

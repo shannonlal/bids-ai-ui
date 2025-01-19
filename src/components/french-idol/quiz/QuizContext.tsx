@@ -7,12 +7,14 @@ interface QuizContextType {
   storyText: string;
   questions: string[];
   answeredQuestions: number[];
+  questionScores: number[];
   setCurrentQuestion: (question: number) => void;
   setScore: (score: number) => void;
   setStoryText: (text: string) => void;
   setQuestions: (questions: string[]) => void;
   markQuestionAnswered: (questionIndex: number, grade: number) => void;
   hasMoreQuestions: () => boolean;
+  resetQuiz: () => void;
 }
 
 export const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -28,12 +30,14 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   const [storyText, setStoryText] = useState(initialStoryText);
   const [questions, setQuestions] = useState<string[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([]);
+  const [questionScores, setQuestionScores] = useState<number[]>([]);
 
   // Reset quiz state when starting a new quiz
   const resetQuiz = () => {
     setCurrentQuestion(0);
     setScore(0);
     setAnsweredQuestions([]);
+    setQuestionScores([]);
   };
 
   // Effect to handle story text updates
@@ -64,6 +68,11 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
       return [...prev, questionIndex];
     });
     setScore(prev => prev + grade);
+    setQuestionScores(prev => {
+      const newScores = [...prev];
+      newScores[questionIndex] = grade;
+      return newScores;
+    });
 
     // Move to next question if available
     if (questionIndex < questions.length - 1) {
@@ -81,6 +90,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     storyText,
     questions,
     answeredQuestions,
+    questionScores,
     setCurrentQuestion,
     setScore,
     setStoryText,
