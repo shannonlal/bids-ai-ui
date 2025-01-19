@@ -1,12 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { QuizView } from './QuizView';
-import { QuizProvider } from './QuizContext';
+import { QuizProvider, QuizContext } from './QuizContext';
 import { FrenchIdolContext } from '../FrenchIdolContext';
+vi.mock('../../../hooks/useDetermineQuestions', () => ({
+  useDetermineQuestions: vi.fn().mockResolvedValue([]),
+}));
 
 describe('QuizView', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   const renderQuizView = (setDisplayStoryUpload = vi.fn()) => {
     return render(
       <FrenchIdolContext.Provider
@@ -19,6 +26,34 @@ describe('QuizView', () => {
       >
         <QuizProvider>
           <QuizView />
+        </QuizProvider>
+      </FrenchIdolContext.Provider>
+    );
+  };
+
+  const renderCompletedQuiz = async (setDisplayStoryUpload = vi.fn()) => {
+    return render(
+      <FrenchIdolContext.Provider
+        value={{
+          displayStoryUpload: false,
+          storyText: 'Test story',
+          setDisplayStoryUpload,
+          setStoryText: vi.fn(),
+        }}
+      >
+        <QuizProvider initialStoryText="Test story">
+          <QuizContext.Consumer>
+            {value => {
+              if (!value) return null;
+              // Set up completed quiz state in next tick to avoid React state updates warning
+              setTimeout(() => {
+                value.setQuestions(['Test question']);
+                value.setCurrentQuestion(1); // Past the last question
+                value.setScore(5);
+              }, 0);
+              return <QuizView />;
+            }}
+          </QuizContext.Consumer>
         </QuizProvider>
       </FrenchIdolContext.Provider>
     );
@@ -39,8 +74,8 @@ describe('QuizView', () => {
 
   it('clicking Start Again button sets displayStoryUpload to true', async () => {
     const setDisplayStoryUpload = vi.fn();
-    renderQuizView(setDisplayStoryUpload);
-    const startAgainButton = screen.getByText('Start Again');
+    renderCompletedQuiz(setDisplayStoryUpload);
+    const startAgainButton = await waitFor(() => screen.getByText('Start Again'));
     await userEvent.click(startAgainButton);
     expect(setDisplayStoryUpload).toHaveBeenCalledWith(true);
   });

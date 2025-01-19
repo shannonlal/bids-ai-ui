@@ -5,9 +5,15 @@ import { useValidResponse } from '../../../hooks/useValidResponse';
 
 interface QuizQuestionProps {
   question: string;
+  questionIndex: number;
+  onAnswered: (index: number, grade: number) => void;
 }
 
-export const QuizQuestion: React.FC<QuizQuestionProps> = ({ question }) => {
+export const QuizQuestion: React.FC<QuizQuestionProps> = ({
+  question,
+  questionIndex,
+  onAnswered,
+}) => {
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState<string>();
   const [grade, setGrade] = useState<number>();
@@ -17,8 +23,10 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({ question }) => {
     if (answer.trim()) {
       const result = await validateResponse(question, answer);
       setError(result.errorMessage);
-      setGrade(result.grade);
+      const questionGrade = result.grade || 0;
+      setGrade(questionGrade);
       setAnswer('');
+      onAnswered(questionIndex, questionGrade);
     }
   };
 

@@ -10,12 +10,16 @@ vi.mock('../../../hooks/useValidResponse', () => ({
 
 describe('QuizQuestion', () => {
   const mockValidateResponse = vi.fn();
+  const mockOnAnswered = vi.fn();
   const defaultProps = {
     question: 'What is the capital of France?',
+    questionIndex: 0,
+    onAnswered: mockOnAnswered,
   };
 
   beforeEach(() => {
     mockValidateResponse.mockClear();
+    mockOnAnswered.mockClear();
     vi.mocked(useValidResponseModule.useValidResponse).mockReturnValue({
       validateResponse: mockValidateResponse,
       isValidating: false,
@@ -47,6 +51,7 @@ describe('QuizQuestion', () => {
     await waitFor(() => {
       expect(screen.getByText('5/5')).toBeInTheDocument();
       expect(input).toHaveValue('');
+      expect(mockOnAnswered).toHaveBeenCalledWith(0, 5);
     });
   });
 
@@ -62,6 +67,7 @@ describe('QuizQuestion', () => {
       expect(screen.getByText('4/5')).toBeInTheDocument();
       expect(screen.getByText('Close, but not quite')).toBeInTheDocument();
       expect(input).toHaveValue('');
+      expect(mockOnAnswered).toHaveBeenCalledWith(0, 4);
     });
   });
 

@@ -3,9 +3,10 @@ import { useQuiz } from './QuizContext';
 import { Button } from '../../../ui-kit/Button';
 import { useFrenchIdol } from '../FrenchIdolContext';
 import { QuizStory } from './QuizStory';
+import { QuizQuestion } from './QuizQuestion';
 
 export const QuizView: React.FC = () => {
-  const { currentQuestion, score } = useQuiz();
+  const { currentQuestion, score, questions, hasMoreQuestions, markQuestionAnswered } = useQuiz();
   const { setDisplayStoryUpload } = useFrenchIdol();
 
   return (
@@ -23,9 +24,25 @@ export const QuizView: React.FC = () => {
         <div className="mt-6 mb-6">
           <QuizStory />
         </div>
-        <div className="flex justify-center">
-          <Button onClick={() => setDisplayStoryUpload(true)}>Start Again</Button>
-        </div>
+        {questions.length > 0 && (
+          <div className="mt-6 mb-6">
+            {hasMoreQuestions() ? (
+              <QuizQuestion
+                question={questions[currentQuestion]}
+                questionIndex={currentQuestion}
+                onAnswered={markQuestionAnswered}
+              />
+            ) : (
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
+                <p className="text-gray-600 mb-6">
+                  Final Score: {score}/{questions.length * 5}
+                </p>
+                <Button onClick={() => setDisplayStoryUpload(true)}>Start Again</Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
