@@ -92,8 +92,10 @@ describe('QuizView', () => {
     expect(setDisplayStoryUpload).toHaveBeenCalledWith(true);
   });
 
-  it('renders QuizStory component', () => {
+  it('renders QuizStory component', async () => {
     renderQuizView();
-    expect(screen.getByPlaceholderText('Enter your story here...')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Enter your story here...')).toBeInTheDocument();
+    });
   });
 });

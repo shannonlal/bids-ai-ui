@@ -81,7 +81,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   };
 
   const hasMoreQuestions = () => {
-    return currentQuestion < questions.length;
+    return currentQuestion < questions.length && answeredQuestions.length < questions.length;
   };
 
   const value = {

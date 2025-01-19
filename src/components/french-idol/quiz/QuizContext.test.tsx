@@ -61,6 +61,38 @@ describe('QuizContext', () => {
     expect(result.current.answeredQuestions).toEqual([]);
   });
 
+  it('correctly identifies when there are more questions', () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <QuizProvider>{children}</QuizProvider>
+    );
+
+    const { result } = renderHook(() => useQuiz(), { wrapper });
+
+    act(() => {
+      result.current.setQuestions(['Q1', 'Q2', 'Q3']);
+    });
+
+    // Initially should have more questions
+    expect(result.current.hasMoreQuestions()).toBe(true);
+
+    act(() => {
+      // Answer first two questions
+      result.current.markQuestionAnswered(0, 3);
+      result.current.markQuestionAnswered(1, 4);
+    });
+
+    // Still has one more question
+    expect(result.current.hasMoreQuestions()).toBe(true);
+
+    act(() => {
+      // Answer last question
+      result.current.markQuestionAnswered(2, 5);
+    });
+
+    // No more questions after answering all
+    expect(result.current.hasMoreQuestions()).toBe(false);
+  });
+
   it('throws error when useQuiz is used outside of QuizProvider', () => {
     expect(() => renderHook(() => useQuiz())).toThrow('useQuiz must be used within a QuizProvider');
   });
