@@ -1,11 +1,37 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 import { GenerateStoryApiResponse } from '../../types/api/generateStory';
+import promptExamples from './generateStoryPrompt.json';
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-key';
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
+
+const buildSystemPrompt = () => {
+  const basePrompt = `You are a french children news author. Your task is to generate short articles base on given text.
+The following are examples of text that are appropriate for children.
+Examples:
+`;
+
+  const examples = promptExamples.articles
+    .map(
+      article => `Title: ${article.title}
+Content: ${article.content}
+`
+    )
+    .join('\n');
+
+  return `${basePrompt}${examples}
+IMPORTANT:
+1. The articles must be written in french
+2. The articles must be appropriate for children aged 10 years old
+3. The articles should not have any inappropriate content or language for children
+4. Even if the text is provided in English, the articles must be written in French and must be appropriate for children aged 10 years old`;
+};
+
+const GENERATE_STORY_SYSTEM_PROMPT = buildSystemPrompt();
 
 export default async function handler(
   req: NextApiRequest,
@@ -37,8 +63,7 @@ export default async function handler(
       messages: [
         {
           role: 'system',
-          content:
-            'You are a creative story generator. Generate an engaging story based on the provided text.',
+          content: GENERATE_STORY_SYSTEM_PROMPT,
         },
         {
           role: 'user',
