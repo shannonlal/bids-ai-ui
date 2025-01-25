@@ -5,9 +5,9 @@ import { QuizResults } from './QuizResults';
 
 describe('QuizResults', () => {
   const mockResults = [
-    { question: 'What is the capital of France?', score: 5 },
-    { question: 'What is the capital of Spain?', score: 4 },
-    { question: 'What is the capital of Italy?', score: 3 },
+    { question: 'What is the capital of France?', score: 5, response: 'Paris' },
+    { question: 'What is the capital of Spain?', score: 4, response: 'Madrid' },
+    { question: 'What is the capital of Italy?', score: 3, response: 'Rome' },
   ];
 
   const defaultProps = {
@@ -19,10 +19,11 @@ describe('QuizResults', () => {
     expect(screen.getByText('Quiz Results')).toBeInTheDocument();
   });
 
-  it('renders all questions and scores', () => {
+  it('renders all questions, responses, and scores', () => {
     render(<QuizResults {...defaultProps} />);
     mockResults.forEach(result => {
       expect(screen.getByText(result.question)).toBeInTheDocument();
+      expect(screen.getByText(result.response)).toBeInTheDocument();
       expect(screen.getByText(`${result.score}/5`)).toBeInTheDocument();
     });
   });
@@ -43,6 +44,7 @@ describe('QuizResults', () => {
   it('renders table headers correctly', () => {
     render(<QuizResults {...defaultProps} />);
     expect(screen.getByText('Question')).toBeInTheDocument();
+    expect(screen.getByText('Response')).toBeInTheDocument();
     expect(screen.getByText('Score')).toBeInTheDocument();
   });
 });

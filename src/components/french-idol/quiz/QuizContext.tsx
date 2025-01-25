@@ -8,11 +8,12 @@ interface QuizContextType {
   questions: string[];
   answeredQuestions: number[];
   questionScores: number[];
+  questionResponses: string[];
   setCurrentQuestion: (question: number) => void;
   setScore: (score: number) => void;
   setStoryText: (text: string) => void;
   setQuestions: (questions: string[]) => void;
-  markQuestionAnswered: (questionIndex: number, grade: number) => void;
+  markQuestionAnswered: (questionIndex: number, grade: number, response: string) => void;
   hasMoreQuestions: () => boolean;
   resetQuiz: () => void;
 }
@@ -31,6 +32,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   const [questions, setQuestions] = useState<string[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([]);
   const [questionScores, setQuestionScores] = useState<number[]>([]);
+  const [questionResponses, setQuestionResponses] = useState<string[]>([]);
 
   // Reset quiz state when starting a new quiz
   const resetQuiz = () => {
@@ -38,6 +40,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     setScore(0);
     setAnsweredQuestions([]);
     setQuestionScores([]);
+    setQuestionResponses([]);
   };
 
   // Effect to handle story text updates
@@ -60,7 +63,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     loadQuestions();
   }, [storyText]);
 
-  const markQuestionAnswered = (questionIndex: number, grade: number) => {
+  const markQuestionAnswered = (questionIndex: number, grade: number, response: string) => {
     setAnsweredQuestions(prev => {
       if (prev.includes(questionIndex)) {
         return prev; // Prevent answering the same question multiple times
@@ -72,6 +75,11 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
       const newScores = [...prev];
       newScores[questionIndex] = grade;
       return newScores;
+    });
+    setQuestionResponses(prev => {
+      const newResponses = [...prev];
+      newResponses[questionIndex] = response;
+      return newResponses;
     });
 
     // Move to next question if available
@@ -91,6 +99,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     questions,
     answeredQuestions,
     questionScores,
+    questionResponses,
     setCurrentQuestion,
     setScore,
     setStoryText,

@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { ValidateResponseApiResponse } from '../types/api/validateResponse';
 
 export interface ValidationResult {
   grade: number;
@@ -9,21 +10,36 @@ export const useValidResponse = () => {
   const [isValidating, setIsValidating] = useState(false);
 
   const validateResponse = useCallback(
-    async (_question: string, _userInput: string): Promise<ValidationResult> => {
+    async (question: string, userInput: string, story: string): Promise<ValidationResult> => {
       setIsValidating(true);
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const response = await fetch('/api/validateResponse', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            story,
+            question,
+            response: userInput,
+          }),
+        });
 
-        // Generate random number between 0 and 5
-        const randomGrade = Math.floor(Math.random() * 6);
+        const data: ValidateResponseApiResponse = await response.json();
 
-        const result: ValidationResult = {
-          grade: randomGrade,
-          ...(randomGrade < 5 && { errorMessage: 'Your response needs improvement' }),
+        if ('error' in data && data.error) {
+          throw new Error(data.error.message);
+        }
+
+        return {
+          grade: data.score,
         };
-
-        return result;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to validate response';
+        return {
+          grade: 0,
+          errorMessage,
+        };
       } finally {
         setIsValidating(false);
       }

@@ -3,6 +3,7 @@ import React from 'react';
 interface QuizResult {
   question: string;
   score: number;
+  response: string;
 }
 
 interface QuizResultsProps {
@@ -24,6 +25,9 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ results }) => {
                 Question
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Response
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Score
               </th>
             </tr>
@@ -33,6 +37,9 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ results }) => {
               <tr key={index}>
                 <td className="px-6 py-4 whitespace-normal text-sm text-gray-900">
                   {result.question}
+                </td>
+                <td className="px-6 py-4 whitespace-normal text-sm text-gray-900">
+                  {result.response}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {result.score}/5
@@ -45,6 +52,7 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ results }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 Total Score
               </td>
+              <td></td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {totalScore}/{maxPossibleScore}
               </td>
