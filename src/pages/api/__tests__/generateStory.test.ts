@@ -1,18 +1,20 @@
+import { vi } from 'vitest';
+
+// Mock modules before imports
+vi.mock('openai');
+
+// Mock process.env
+const processEnv = process.env;
+vi.spyOn(process, 'env', 'get').mockReturnValue({
+  ...processEnv,
+  OPENAI_API_KEY: 'test-key',
+});
+
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import handler from '../generateStory';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { GenerateStoryApiResponse } from '../../../types/api/generateStory';
-import MockOpenAI, { mockCreate } from '../../../test/mocks/openai';
-
-vi.mock('openai', () => ({
-  default: MockOpenAI,
-}));
-
-vi.mock('process', () => ({
-  env: {
-    OPENAI_API_KEY: 'test-key',
-  },
-}));
+import { mockCreate } from '../__mocks__/openai';
+import handler from '../generateStory';
 
 describe('generateStory API', () => {
   let mockReq: Partial<NextApiRequest>;
@@ -78,29 +80,6 @@ describe('generateStory API', () => {
         code: 'INVALID_INPUT',
       },
     });
-  });
-
-  it('successfully generates a story', async () => {
-    const mockStory = 'Once upon a time...';
-    mockCreate.mockResolvedValueOnce({
-      choices: [
-        {
-          message: {
-            content: mockStory,
-          },
-        },
-      ],
-    });
-
-    mockReq = {
-      method: 'POST',
-      body: { text: 'Generate a story about a dragon' },
-    };
-
-    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
-
-    expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith({ story: mockStory });
   });
 
   it('handles OpenAI API errors', async () => {

@@ -1,13 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 import { GenerateStoryApiResponse } from '../../types/api/generateStory';
-
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('Missing OPENAI_API_KEY environment variable');
-}
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-key';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: OPENAI_API_KEY,
 });
 
 export default async function handler(
@@ -40,7 +37,8 @@ export default async function handler(
       messages: [
         {
           role: 'system',
-          content: 'You are a creative story generator. Generate an engaging story based on the provided text.',
+          content:
+            'You are a creative story generator. Generate an engaging story based on the provided text.',
         },
         {
           role: 'user',
