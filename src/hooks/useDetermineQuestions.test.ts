@@ -9,7 +9,7 @@ describe('determineQuestions', () => {
 
   it('should return an array of questions from the API', async () => {
     const mockQuestions = ['Question 1?', 'Question 2?', 'Question 3?'];
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ questions: mockQuestions }),
     });
@@ -29,7 +29,7 @@ describe('determineQuestions', () => {
 
   it('should throw error when API call fails', async () => {
     const errorMessage = 'API Error';
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: false,
       json: async () => ({ error: { message: errorMessage } }),
     });
