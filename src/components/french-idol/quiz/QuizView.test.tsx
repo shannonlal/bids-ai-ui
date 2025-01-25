@@ -14,13 +14,13 @@ describe('QuizView', () => {
     vi.clearAllMocks();
   });
 
-  const renderQuizView = (setDisplayStoryUpload = vi.fn()) => {
+  const renderQuizView = () => {
     return render(
       <FrenchIdolContext.Provider
         value={{
           displayStoryUpload: false,
           storyText: 'Test story',
-          setDisplayStoryUpload,
+          setDisplayStoryUpload: vi.fn(),
           setStoryText: vi.fn(),
         }}
       >

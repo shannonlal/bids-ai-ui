@@ -1,24 +1,38 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { useEffect } from 'react';
 import React from 'react';
 import { FrenchIdolProvider, useFrenchIdol } from './FrenchIdolContext';
 
 // Test component that uses the context
 function TestComponent() {
   const { displayStoryUpload, setDisplayStoryUpload } = useFrenchIdol();
-
-  useEffect(() => {
-    // Toggle the value after render
-    setDisplayStoryUpload(!displayStoryUpload);
-  }, []);
-
-  return <div data-testid="test-value">{displayStoryUpload.toString()}</div>;
+  return (
+    <div>
+      <div data-testid="test-value">{displayStoryUpload.toString()}</div>
+      <button
+        data-testid="toggle-button"
+        onClick={() => setDisplayStoryUpload(!displayStoryUpload)}
+      >
+        Toggle
+      </button>
+    </div>
+  );
 }
 
 describe('FrenchIdolContext', () => {
-  it('provides displayStoryUpload state and setter', () => {
+  it('provides displayStoryUpload state with correct initial value', () => {
+    render(
+      <FrenchIdolProvider>
+        <TestComponent />
+      </FrenchIdolProvider>
+    );
+
+    // Initial value should be true (as defined in context)
+    expect(screen.getByTestId('test-value')).toHaveTextContent('true');
+  });
+
+  it('allows updating displayStoryUpload state', () => {
     render(
       <FrenchIdolProvider>
         <TestComponent />
@@ -26,6 +40,12 @@ describe('FrenchIdolContext', () => {
     );
 
     // Initial value should be true
+    expect(screen.getByTestId('test-value')).toHaveTextContent('true');
+
+    // Click button to toggle value
+    fireEvent.click(screen.getByTestId('toggle-button'));
+
+    // Value should now be false
     expect(screen.getByTestId('test-value')).toHaveTextContent('false');
   });
 
