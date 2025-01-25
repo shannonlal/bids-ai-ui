@@ -2,6 +2,20 @@ import { useState } from 'react';
 import { TextArea } from '../../ui-kit/TextArea';
 import { Button } from '../../ui-kit/Button';
 import { useFrenchIdol } from '../french-idol/FrenchIdolContext';
+import { GenerateStoryApiResponse } from '../../types/api/generateStory';
+
+const escapeText = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/\\/g, '\\\\')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
+};
 
 export const StoryInput = () => {
   const { setStoryText, setDisplayStoryUpload, setInputMethod } = useFrenchIdol();
@@ -32,9 +46,32 @@ export const StoryInput = () => {
             setError('');
             setIsLoading(true);
             try {
-              setStoryText(text);
-              setInputMethod('text');
-              setDisplayStoryUpload(false);
+              const response = await fetch('/api/generateStory', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: escapeText(text) }),
+              });
+
+              const data: GenerateStoryApiResponse = await response.json();
+
+              if (!response.ok) {
+                throw new Error(data.error?.message || 'Failed to generate story');
+              }
+
+              if (data.story) {
+                try {
+                  const storyObj = JSON.parse(data.story);
+                  setStoryText(storyObj.article);
+                } catch (e) {
+                  setStoryText(data.story);
+                }
+                setInputMethod('text');
+                setDisplayStoryUpload(false);
+              }
+            } catch (e) {
+              setError(e instanceof Error ? e.message : 'Failed to generate story');
             } finally {
               setIsLoading(false);
             }
