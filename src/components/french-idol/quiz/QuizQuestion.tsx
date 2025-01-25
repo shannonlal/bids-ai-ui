@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput } from '../../../ui-kit/TextInput';
 import { Button } from '../../../ui-kit/Button';
 import { useValidResponse } from '../../../hooks/useValidResponse';
+import { useQuiz } from './QuizContext';
 
 interface QuizQuestionProps {
   question: string;
@@ -25,6 +26,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
     setAnswer('');
   }, [question]);
   const { validateResponse, isValidating } = useValidResponse();
+  const { storyText } = useQuiz();
 
   const handleSubmit = async () => {
     if (!answer.trim()) {
@@ -34,11 +36,11 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
     try {
       setError('');
-      const result = await validateResponse(question, answer);
-      // if (result.errorMessage) {
-      //   setError(result.errorMessage);
-      //   return;
-      // }
+      const result = await validateResponse(question, answer, storyText);
+      if (result.errorMessage) {
+        setError(result.errorMessage);
+        return;
+      }
 
       const questionGrade = result.grade || 0;
       setGrade(questionGrade);
