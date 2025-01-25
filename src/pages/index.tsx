@@ -21,12 +21,7 @@ const Home: NextPage = () => {
             {/* Story Input Section */}
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Story Input</h2>
-              <StoryInput
-                onSubmit={text => {
-                  console.log('Submitted text:', text);
-                  // Handle the submitted text here
-                }}
-              />
+              <StoryInput />
             </div>
 
             {/* Buttons Section */}
