@@ -14,6 +14,11 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'json', 'html'],
     },
+    server: {
+      deps: {
+        inline: [/^(?!.*vitest).*$/],
+      },
+    },
   },
   resolve: {
     alias: {
