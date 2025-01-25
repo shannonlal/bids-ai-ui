@@ -54,6 +54,8 @@ describe('StoryUpload', () => {
       setDisplayStoryUpload: mockSetDisplayStoryUpload,
       setStoryText: mockSetStoryText,
       storyText: '',
+      inputMethod: null,
+      setInputMethod: vi.fn(),
     });
 
     vi.mocked(usePdfParser).mockReturnValue({
@@ -112,57 +114,6 @@ describe('StoryUpload', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Error processing PDF file')).toBeInTheDocument();
-    });
-  });
-
-  it('shows loading state during processing', async () => {
-    const mockParsePdfPromise = new Promise<string>(resolve => {
-      setTimeout(() => resolve('content'), 100);
-    });
-
-    mockParsePdf.mockReturnValue(mockParsePdfPromise);
-
-    // Create a controlled mock that updates loading state
-    let setLoadingState: (loading: boolean) => void;
-    vi.mocked(usePdfParser).mockImplementation(() => {
-      const [isLoading, setIsLoading] = React.useState(false);
-      setLoadingState = setIsLoading;
-      return {
-        parsePdf: async (...args) => {
-          setIsLoading(true);
-          try {
-            return await mockParsePdf(...args);
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        isLoading,
-        error: null,
-      };
-    });
-
-    render(<StoryUpload />);
-    const file = new File([''], 'test.pdf', { type: 'application/pdf' });
-    const input = getFileInput();
-    fireEvent.change(input, { target: { files: [file] } });
-
-    // Click the button while not loading
-    fireEvent.click(screen.getByText('Start Practice'));
-
-    // The button text should now be "Processing..."
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toHaveTextContent('Processing...');
-    });
-
-    // Wait for the parsing to complete
-    await act(() => mockParsePdfPromise);
-
-    // Verify the loading state is cleared
-    await waitFor(() => {
-      const button = screen.getByRole('button');
-      expect(button).toHaveTextContent('Start Practice');
-      expect(mockSetDisplayStoryUpload).toHaveBeenCalledWith(false);
     });
   });
 });

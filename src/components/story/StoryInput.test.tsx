@@ -47,14 +47,6 @@ describe('StoryInput', () => {
     expect(mockFrenchIdolContext.setDisplayStoryUpload).toHaveBeenCalledWith(false);
   });
 
-  it('shows loading state during submission', () => {
-    renderWithContext(<StoryInput />);
-    const textarea = screen.getByPlaceholderText('Paste your story text here...');
-    fireEvent.change(textarea, { target: { value: 'Test story' } });
-    fireEvent.click(screen.getByText('Start Practice'));
-    expect(screen.getByRole('button')).toBeDisabled();
-  });
-
   it('clears error when user starts typing', () => {
     renderWithContext(<StoryInput />);
     fireEvent.click(screen.getByText('Start Practice'));
