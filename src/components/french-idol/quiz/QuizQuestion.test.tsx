@@ -16,6 +16,7 @@ const mockQuizContext = {
   questions: ['Test question'],
   answeredQuestions: [],
   questionScores: [],
+  questionResponses: [],
   setCurrentQuestion: vi.fn(),
   setScore: vi.fn(),
   setStoryText: vi.fn(),
@@ -74,7 +75,7 @@ describe('QuizQuestion', () => {
       mockQuizContext.storyText
     );
     await waitFor(() => {
-      expect(mockOnAnswered).toHaveBeenCalledWith(0, 5);
+      expect(mockOnAnswered).toHaveBeenCalledWith(0, 5, 'Paris');
     });
     await waitFor(() => {
       const gradeText = screen.getByText('5/5');

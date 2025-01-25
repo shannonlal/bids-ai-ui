@@ -15,6 +15,7 @@ export const QuizView: React.FC = () => {
     markQuestionAnswered,
     answeredQuestions,
     questionScores,
+    questionResponses,
   } = useQuiz();
   const { setDisplayStoryUpload } = useFrenchIdol();
 
@@ -56,6 +57,7 @@ export const QuizView: React.FC = () => {
                   results={questions.map((question, index) => ({
                     question,
                     score: questionScores[index] || 0,
+                    response: questionResponses[index] || '',
                   }))}
                 />
                 <div className="text-center">
