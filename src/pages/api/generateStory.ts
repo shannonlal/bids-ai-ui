@@ -24,11 +24,19 @@ Content: ${article.content}
     .join('\n');
 
   return `${basePrompt}${examples}
+
+  Output:
+  {
+    "title":"Article title.  Should be less than 10 words",
+    "article":"Article content.  Should be less than 300 words"
+  }}
 IMPORTANT:
 1. The articles must be written in french
 2. The articles must be appropriate for children aged 10 years old
 3. The articles should not have any inappropriate content or language for children
-4. Even if the text is provided in English, the articles must be written in French and must be appropriate for children aged 10 years old`;
+4. Even if the text is provided in English, the articles must be written in French and must be appropriate for children aged 10 years old
+5. Article content should be less than 300 words
+`;
 };
 
 const GENERATE_STORY_SYSTEM_PROMPT = buildSystemPrompt();
