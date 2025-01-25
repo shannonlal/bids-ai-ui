@@ -3,6 +3,7 @@ import type { NextPage } from 'next';
 import { Button } from '../ui-kit/Button';
 import { Dropdown } from '../ui-kit/Dropdown';
 import { IconPlus } from '../ui-kit/icons/IconPlus';
+import { StoryInput } from '../components/story/StoryInput';
 
 const Home: NextPage = () => {
   return (
@@ -16,7 +17,18 @@ const Home: NextPage = () => {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Tailwind Components Demo</h1>
 
-          <div className="space-y-8">
+          <div className="space-y-12">
+            {/* Story Input Section */}
+            <div className="card">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Story Input</h2>
+              <StoryInput
+                onSubmit={text => {
+                  console.log('Submitted text:', text);
+                  // Handle the submitted text here
+                }}
+              />
+            </div>
+
             {/* Buttons Section */}
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Buttons</h2>

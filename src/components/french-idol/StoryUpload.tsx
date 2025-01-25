@@ -31,7 +31,7 @@ const DynamicPDFParser = dynamic(
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export function StoryUpload() {
-  const { displayStoryUpload, setDisplayStoryUpload, setStoryText } = useFrenchIdol();
+  const { setDisplayStoryUpload, setStoryText, setInputMethod } = useFrenchIdol();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,10 +62,6 @@ export function StoryUpload() {
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
-
-  if (!displayStoryUpload) {
-    return null;
-  }
 
   return (
     <DynamicPDFParser>
@@ -108,6 +104,7 @@ export function StoryUpload() {
                 try {
                   const parsedText = await parsePdf(file);
                   setStoryText(parsedText);
+                  setInputMethod('upload');
                   setDisplayStoryUpload(false);
                 } catch (err) {
                   console.error('Error processing file:', err);
