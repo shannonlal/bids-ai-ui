@@ -21,6 +21,12 @@ Grading criteria:
 1.5 points for writing a complete sentence
 2 points for grammar
 
+Here are key points for grammar:
+1. The sentences must have a period at the end
+2. Must start with a capital letter and have Capital letters for proper nouns
+3. Must have proper accented characters for French
+4. 
+
 Return only a number between 0 and 5.`;
 
 export default async function handler(
