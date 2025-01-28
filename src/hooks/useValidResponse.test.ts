@@ -21,8 +21,11 @@ describe('useValidResponse', () => {
     expect(result.current.isValidating).toBe(false);
   });
 
-  it('should return a grade between 0 and 5', async () => {
-    const mockResponse: ValidateResponseApiResponse = { score: 3 };
+  it('should return a grade and correction', async () => {
+    const mockResponse: ValidateResponseApiResponse = {
+      score: 3,
+      correction: 'Bien fait! Votre réponse est correcte mais pourrait être plus détaillée.',
+    };
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       json: () => Promise.resolve(mockResponse),
     });
@@ -34,6 +37,9 @@ describe('useValidResponse', () => {
     });
 
     expect(validationResult.grade).toBe(3);
+    expect(validationResult.correction).toBe(
+      'Bien fait! Votre réponse est correcte mais pourrait être plus détaillée.'
+    );
   });
 
   it('should include error message when API returns an error', async () => {
@@ -58,7 +64,10 @@ describe('useValidResponse', () => {
   });
 
   it('should not include error message when API returns a valid score', async () => {
-    const mockResponse: ValidateResponseApiResponse = { score: 5 };
+    const mockResponse: ValidateResponseApiResponse = {
+      score: 5,
+      correction: 'Excellent travail! Votre réponse est parfaite.',
+    };
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       json: () => Promise.resolve(mockResponse),
     });
@@ -70,6 +79,7 @@ describe('useValidResponse', () => {
     });
 
     expect(validationResult.grade).toBe(5);
+    expect(validationResult.correction).toBe('Excellent travail! Votre réponse est parfaite.');
     expect(validationResult.errorMessage).toBeUndefined();
   });
 });

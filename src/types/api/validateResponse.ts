@@ -6,6 +6,7 @@ export interface ValidateResponseRequest {
 
 export interface ValidateResponseSuccess {
   score: number;
+  correction: string;
   error?: never;
 }
 

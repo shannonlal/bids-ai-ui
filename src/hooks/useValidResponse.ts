@@ -3,6 +3,7 @@ import { ValidateResponseApiResponse } from '../types/api/validateResponse';
 
 export interface ValidationResult {
   grade: number;
+  correction?: string;
   errorMessage?: string;
 }
 
@@ -33,6 +34,7 @@ export const useValidResponse = () => {
 
         return {
           grade: data.score,
+          correction: data.correction,
         };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to validate response';

@@ -25,9 +25,12 @@ Here are key points for grammar:
 1. The sentences must have a period at the end
 2. Must start with a capital letter and have Capital letters for proper nouns
 3. Must have proper accented characters for French
-4. 
 
-Return only a number between 0 and 5.`;
+Provide your response in the following JSON format:
+{
+  "score": (number between 0 and 5),
+  "correction": "(detailed explanation in French of the grade, including what was done well and what could be improved. Even for perfect scores, provide encouraging feedback)"
+}`;
 
 export default async function handler(
   req: NextApiRequest,
@@ -99,18 +102,37 @@ export default async function handler(
       });
     }
 
-    // Parse the score from the response
-    const score = parseFloat(aiResponse);
-    if (isNaN(score) || score < 0 || score > 5) {
+    try {
+      const parsedResponse = JSON.parse(aiResponse);
+
+      if (
+        !parsedResponse.score ||
+        !parsedResponse.correction ||
+        typeof parsedResponse.score !== 'number' ||
+        typeof parsedResponse.correction !== 'string' ||
+        parsedResponse.score < 0 ||
+        parsedResponse.score > 5
+      ) {
+        return res.status(500).json({
+          error: {
+            message: 'Invalid response format from validation',
+            code: 'INVALID_RESPONSE_FORMAT',
+          },
+        });
+      }
+
+      return res.status(200).json({
+        score: parsedResponse.score,
+        correction: parsedResponse.correction,
+      });
+    } catch (parseError) {
       return res.status(500).json({
         error: {
-          message: 'Invalid score returned from validation',
-          code: 'INVALID_SCORE',
+          message: 'Failed to parse validation response',
+          code: 'PARSE_ERROR',
         },
       });
     }
-
-    return res.status(200).json({ score });
   } catch (error) {
     console.error('Error validating response:', error);
     return res.status(500).json({

@@ -141,7 +141,11 @@ describe('validateResponse API', () => {
       choices: [
         {
           message: {
-            content: '4.5',
+            content: JSON.stringify({
+              score: 4.5,
+              correction:
+                'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
+            }),
           },
         },
       ],
@@ -159,15 +163,19 @@ describe('validateResponse API', () => {
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
     expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith({ score: 4.5 });
+    expect(jsonMock).toHaveBeenCalledWith({
+      score: 4.5,
+      correction:
+        'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
+    });
   });
 
-  it('handles invalid score from OpenAI', async () => {
+  it('handles invalid response format from OpenAI', async () => {
     mockCreate.mockResolvedValueOnce({
       choices: [
         {
           message: {
-            content: 'invalid score',
+            content: 'invalid json',
           },
         },
       ],
@@ -187,8 +195,42 @@ describe('validateResponse API', () => {
     expect(statusMock).toHaveBeenCalledWith(500);
     expect(jsonMock).toHaveBeenCalledWith({
       error: {
-        message: 'Invalid score returned from validation',
-        code: 'INVALID_SCORE',
+        message: 'Failed to parse validation response',
+        code: 'PARSE_ERROR',
+      },
+    });
+  });
+
+  it('handles missing fields in OpenAI response', async () => {
+    mockCreate.mockResolvedValueOnce({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              score: 4.5,
+              // missing correction field
+            }),
+          },
+        },
+      ],
+    });
+
+    mockReq = {
+      method: 'POST',
+      body: {
+        story: 'test story',
+        question: 'test question',
+        response: 'test response',
+      },
+    };
+
+    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+    expect(statusMock).toHaveBeenCalledWith(500);
+    expect(jsonMock).toHaveBeenCalledWith({
+      error: {
+        message: 'Invalid response format from validation',
+        code: 'INVALID_RESPONSE_FORMAT',
       },
     });
   });
