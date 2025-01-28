@@ -17,6 +17,7 @@ const mockQuizContext = {
   answeredQuestions: [],
   questionScores: [],
   questionResponses: [],
+  questionCorrections: [],
   setCurrentQuestion: vi.fn(),
   setScore: vi.fn(),
   setStoryText: vi.fn(),
@@ -61,7 +62,10 @@ describe('QuizQuestion', () => {
   });
 
   it('validates answer and shows result when submit button is clicked', async () => {
-    mockValidateResponse.mockResolvedValueOnce({ grade: 5 });
+    mockValidateResponse.mockResolvedValueOnce({
+      grade: 5,
+      correction: 'Excellent! Votre réponse est parfaite.',
+    });
     renderWithQuizContext(<QuizQuestion {...defaultProps} />);
     const input = screen.getByPlaceholderText('Enter your answer...');
     const submitButton = screen.getByText('Submit');
@@ -75,7 +79,12 @@ describe('QuizQuestion', () => {
       mockQuizContext.storyText
     );
     await waitFor(() => {
-      expect(mockOnAnswered).toHaveBeenCalledWith(0, 5, 'Paris');
+      expect(mockOnAnswered).toHaveBeenCalledWith(
+        0,
+        5,
+        'Paris',
+        'Excellent! Votre réponse est parfaite.'
+      );
     });
     await waitFor(() => {
       const gradeText = screen.getByText('5/5');

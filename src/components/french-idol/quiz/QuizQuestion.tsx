@@ -7,7 +7,7 @@ import { useQuiz } from './QuizContext';
 interface QuizQuestionProps {
   question: string;
   questionIndex: number;
-  onAnswered: (index: number, grade: number, response: string) => void;
+  onAnswered: (index: number, grade: number, response: string, correction: string) => void;
 }
 
 export const QuizQuestion: React.FC<QuizQuestionProps> = ({
@@ -44,7 +44,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
       const questionGrade = result.grade || 0;
       setGrade(questionGrade);
-      onAnswered(questionIndex, questionGrade, answer);
+      onAnswered(questionIndex, questionGrade, answer, result.correction || '');
       setAnswer('');
     } catch (err) {
       setError(

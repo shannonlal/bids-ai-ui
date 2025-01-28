@@ -29,7 +29,7 @@ Here are key points for grammar:
 Provide your response in the following JSON format:
 {
   "score": (number between 0 and 5),
-  "correction": "(detailed explanation in French of the grade, including what was done well and what could be improved. Even for perfect scores, provide encouraging feedback)"
+  "correction": "(detailed explanation in French of the grade, including what was done well and what could be improved. Even for perfect scores, provide encouraging feedback.  No more than 30 words)"
 }`;
 
 export default async function handler(
@@ -103,11 +103,10 @@ export default async function handler(
     }
 
     try {
+      console.log('Parsing response:', aiResponse);
       const parsedResponse = JSON.parse(aiResponse);
 
       if (
-        !parsedResponse.score ||
-        !parsedResponse.correction ||
         typeof parsedResponse.score !== 'number' ||
         typeof parsedResponse.correction !== 'string' ||
         parsedResponse.score < 0 ||
@@ -126,6 +125,7 @@ export default async function handler(
         correction: parsedResponse.correction,
       });
     } catch (parseError) {
+      console.error('Parse error:', parseError);
       return res.status(500).json({
         error: {
           message: 'Failed to parse validation response',

@@ -5,9 +5,24 @@ import { QuizResults } from './QuizResults';
 
 describe('QuizResults', () => {
   const mockResults = [
-    { question: 'What is the capital of France?', score: 5, response: 'Paris' },
-    { question: 'What is the capital of Spain?', score: 4, response: 'Madrid' },
-    { question: 'What is the capital of Italy?', score: 3, response: 'Rome' },
+    {
+      question: 'What is the capital of France?',
+      score: 5,
+      response: 'Paris',
+      correction: 'Excellent! Votre réponse est parfaite.',
+    },
+    {
+      question: 'What is the capital of Spain?',
+      score: 4,
+      response: 'Madrid',
+      correction: 'Très bien! Votre réponse est correcte.',
+    },
+    {
+      question: 'What is the capital of Italy?',
+      score: 3,
+      response: 'Rome',
+      correction: 'Bien! Mais il faut faire attention aux accents.',
+    },
   ];
 
   const defaultProps = {
@@ -46,5 +61,13 @@ describe('QuizResults', () => {
     expect(screen.getByText('Question')).toBeInTheDocument();
     expect(screen.getByText('Response')).toBeInTheDocument();
     expect(screen.getByText('Score')).toBeInTheDocument();
+    expect(screen.getByText('Feedback')).toBeInTheDocument();
+  });
+
+  it('renders feedback for each question', () => {
+    render(<QuizResults {...defaultProps} />);
+    mockResults.forEach(result => {
+      expect(screen.getByText(result.correction)).toBeInTheDocument();
+    });
   });
 });
