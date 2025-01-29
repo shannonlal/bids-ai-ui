@@ -14,8 +14,11 @@ export class UserService {
    */
   async getUserByEmail(email: string): Promise<UserType> {
     await connectDB();
-    console.log('email', email);
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const query = { email: email.toLowerCase() };
+    console.log('Searching for user with query:', query);
+
+    const user = await User.findOne(query);
+    console.log('Raw user search result:', user);
 
     if (!user) {
       throw new Error(`User not found with email: ${email}`);
@@ -30,7 +33,12 @@ export class UserService {
    */
   async getAllUsers(): Promise<UserType[]> {
     await connectDB();
+    console.log('Fetching all users...');
+
     const users = await User.find({});
+    console.log('Raw query result:', JSON.stringify(users, null, 2));
+    console.log(`Found ${users.length} users`);
+
     return users.map(mapUserToDTO);
   }
 
@@ -41,7 +49,12 @@ export class UserService {
    */
   async exists(email: string): Promise<boolean> {
     await connectDB();
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const query = { email: email.toLowerCase() };
+    console.log('Checking user existence with query:', query);
+
+    const user = await User.findOne(query);
+    console.log('Raw existence check result:', user);
+
     return !!user;
   }
 }

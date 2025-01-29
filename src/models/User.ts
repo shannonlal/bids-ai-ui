@@ -9,8 +9,8 @@ export interface IUserDocument extends Document {
   email: string;
   firstName: string;
   lastName: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string; // Changed to string to match DB
+  updatedAt: string; // Changed to string to match DB
 }
 
 /**
@@ -35,17 +35,28 @@ const userSchema = new Schema<IUserDocument>(
       required: true,
       trim: true,
     },
+    createdAt: {
+      type: String,
+      required: true,
+    },
+    updatedAt: {
+      type: String,
+      required: true,
+    },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt fields automatically
+    collection: 'User', // Explicitly set collection name
   }
 );
+
+// Model name for caching
+const MODEL_NAME = 'french-idol.User';
 
 // Create and export the model
 // Using type assertion since the model might not exist yet in Next.js hot reloading
 export const User =
-  (mongoose.models.User as mongoose.Model<IUserDocument>) ||
-  mongoose.model<IUserDocument>('User', userSchema);
+  (mongoose.models[MODEL_NAME] as mongoose.Model<IUserDocument>) ||
+  mongoose.model<IUserDocument>(MODEL_NAME, userSchema);
 
 // Utility function to transform MongoDB document to frontend type
 export function mapUserToDTO(user: IUserDocument): UserType {
@@ -54,7 +65,7 @@ export function mapUserToDTO(user: IUserDocument): UserType {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString(),
+    createdAt: user.createdAt, // Already a string
+    updatedAt: user.updatedAt, // Already a string
   };
 }

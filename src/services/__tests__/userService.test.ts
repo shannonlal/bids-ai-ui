@@ -15,8 +15,8 @@ describe('UserService', () => {
     email: 'test@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: '2024-01-29T12:00:00.000Z',
+    updatedAt: '2024-01-29T12:00:00.000Z',
   };
 
   beforeEach(() => {
@@ -39,8 +39,8 @@ describe('UserService', () => {
         email: mockUser.email,
         firstName: mockUser.firstName,
         lastName: mockUser.lastName,
-        createdAt: mockUser.createdAt!.toISOString(),
-        updatedAt: mockUser.updatedAt!.toISOString(),
+        createdAt: mockUser.createdAt,
+        updatedAt: mockUser.updatedAt,
       });
     });
 
@@ -83,8 +83,8 @@ describe('UserService', () => {
         email: mockUsers[0].email,
         firstName: mockUsers[0].firstName,
         lastName: mockUsers[0].lastName,
-        createdAt: mockUsers[0].createdAt!.toISOString(),
-        updatedAt: mockUsers[0].updatedAt!.toISOString(),
+        createdAt: mockUsers[0].createdAt,
+        updatedAt: mockUsers[0].updatedAt,
       });
     });
 

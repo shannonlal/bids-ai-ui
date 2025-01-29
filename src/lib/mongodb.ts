@@ -25,10 +25,12 @@ async function connectDB(): Promise<typeof mongoose> {
   }
 
   try {
+    console.log('Connecting to MongoDB...');
     const mongooseInstance = await mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
     });
 
+    // Store the connection
     globalWithMongoose.mongooseConnection = mongooseInstance;
 
     // Handle cleanup on app termination
