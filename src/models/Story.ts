@@ -1,0 +1,82 @@
+import mongoose, { Document, Schema } from 'mongoose';
+import { Story as StoryType } from '../types/story';
+
+/**
+ * Interface for the Story document in MongoDB
+ */
+export interface IStoryDocument extends Document {
+  _id: mongoose.Types.ObjectId;
+  userEmail: string;
+  sourceText: string;
+  title: string;
+  article: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Mongoose schema definition for Story
+ */
+const storySchema = new Schema<IStoryDocument>(
+  {
+    userEmail: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    sourceText: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    article: {
+      type: String,
+      required: true,
+    },
+    read: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    createdAt: {
+      type: String,
+      required: true,
+    },
+    updatedAt: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    collection: 'Story', // Explicitly set collection name
+  }
+);
+
+// Model name for caching
+const MODEL_NAME = 'french-idol.Story';
+
+// Create and export the model
+// Using type assertion since the model might not exist yet in Next.js hot reloading
+export const Story =
+  (mongoose.models[MODEL_NAME] as mongoose.Model<IStoryDocument>) ||
+  mongoose.model<IStoryDocument>(MODEL_NAME, storySchema);
+
+// Utility function to transform MongoDB document to frontend type
+export function mapStoryToDTO(story: IStoryDocument): StoryType {
+  return {
+    id: story._id.toString(),
+    userEmail: story.userEmail,
+    sourceText: story.sourceText,
+    title: story.title,
+    article: story.article,
+    read: story.read,
+    createdAt: story.createdAt,
+    updatedAt: story.updatedAt,
+  };
+}
