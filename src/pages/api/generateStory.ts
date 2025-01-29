@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 import { GenerateStoryApiResponse } from '../../types/api/generateStory';
 import promptExamples from './generateStoryPrompt.json';
+import { storyService } from '../../services/storyService';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-key';
 
@@ -29,7 +30,7 @@ Content: ${article.content}
   {
     "title":"Article title.  Should be less than 10 words",
     "article":"Article content.  Should be less than 300 words"
-  }}
+  }
 IMPORTANT:
 1. The articles must be written in french
 2. The articles must be appropriate for children aged 10 years old
@@ -54,12 +55,21 @@ export default async function handler(
     });
   }
 
-  const { text } = req.body;
+  const { text, email } = req.body;
 
   if (!text || typeof text !== 'string') {
     return res.status(400).json({
       error: {
         message: 'Text field is required and must be a string',
+        code: 'INVALID_INPUT',
+      },
+    });
+  }
+
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({
+      error: {
+        message: 'Email field is required and must be a string',
         code: 'INVALID_INPUT',
       },
     });
@@ -82,9 +92,11 @@ export default async function handler(
       max_tokens: 1000,
     });
 
-    const story = completion.choices[0]?.message?.content;
+    const storyContent = completion.choices[0]?.message?.content;
 
-    if (!story) {
+    console.log('Generated story:', storyContent);
+
+    if (!storyContent) {
       return res.status(500).json({
         error: {
           message: 'Failed to generate story',
@@ -93,7 +105,24 @@ export default async function handler(
       });
     }
 
-    return res.status(200).json({ story });
+    try {
+      const parsedStory = JSON.parse(storyContent);
+      const savedStory = await storyService.saveStory(
+        email,
+        parsedStory.title,
+        text,
+        parsedStory.article
+      );
+      return res.status(200).json({ story: savedStory });
+    } catch (parseError) {
+      console.error('Error parsing story:', parseError);
+      return res.status(500).json({
+        error: {
+          message: 'Failed to parse generated story',
+          code: 'PARSE_ERROR',
+        },
+      });
+    }
   } catch (error) {
     console.error('Error generating story:', error);
     return res.status(500).json({

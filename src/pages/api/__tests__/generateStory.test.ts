@@ -2,6 +2,20 @@ import { vi } from 'vitest';
 
 // Mock modules before imports
 vi.mock('openai');
+vi.mock('../../../services/storyService', () => ({
+  storyService: {
+    saveStory: vi.fn().mockImplementation((email, title, sourceText, article) => ({
+      id: 'test-id',
+      userEmail: email,
+      title,
+      sourceText,
+      article,
+      read: false,
+      createdAt: '2025-01-29T00:00:00.000Z',
+      updatedAt: '2025-01-29T00:00:00.000Z',
+    })),
+  },
+}));
 
 // Mock process.env
 const processEnv = process.env;
@@ -51,7 +65,7 @@ describe('generateStory API', () => {
   it('returns 400 when text is missing', async () => {
     mockReq = {
       method: 'POST',
-      body: {},
+      body: { email: 'test@example.com' },
     };
 
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
@@ -68,7 +82,7 @@ describe('generateStory API', () => {
   it('returns 400 when text is not a string', async () => {
     mockReq = {
       method: 'POST',
-      body: { text: 123 },
+      body: { text: 123, email: 'test@example.com' },
     };
 
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
@@ -82,12 +96,46 @@ describe('generateStory API', () => {
     });
   });
 
+  it('returns 400 when email is missing', async () => {
+    mockReq = {
+      method: 'POST',
+      body: { text: 'test story' },
+    };
+
+    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+    expect(statusMock).toHaveBeenCalledWith(400);
+    expect(jsonMock).toHaveBeenCalledWith({
+      error: {
+        message: 'Email field is required and must be a string',
+        code: 'INVALID_INPUT',
+      },
+    });
+  });
+
+  it('returns 400 when email is not a string', async () => {
+    mockReq = {
+      method: 'POST',
+      body: { text: 'test story', email: 123 },
+    };
+
+    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+    expect(statusMock).toHaveBeenCalledWith(400);
+    expect(jsonMock).toHaveBeenCalledWith({
+      error: {
+        message: 'Email field is required and must be a string',
+        code: 'INVALID_INPUT',
+      },
+    });
+  });
+
   it('handles OpenAI API errors', async () => {
     mockCreate.mockRejectedValueOnce(new Error('API Error'));
 
     mockReq = {
       method: 'POST',
-      body: { text: 'Generate a story about a dragon' },
+      body: { text: 'Generate a story about a dragon', email: 'test@example.com' },
     };
 
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);

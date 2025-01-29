@@ -18,7 +18,7 @@ const escapeText = (text: string): string => {
 };
 
 export const StoryInput = () => {
-  const { setStoryText, setDisplayStoryUpload, setInputMethod } = useFrenchIdol();
+  const { setStoryText, setDisplayStoryUpload, setInputMethod, currentUser } = useFrenchIdol();
   const [isLoading, setIsLoading] = useState(false);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
@@ -51,7 +51,10 @@ export const StoryInput = () => {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ text: escapeText(text) }),
+                body: JSON.stringify({
+                  text: escapeText(text),
+                  email: currentUser?.email || '',
+                }),
               });
 
               const data: GenerateStoryApiResponse = await response.json();
@@ -61,12 +64,7 @@ export const StoryInput = () => {
               }
 
               if (data.story) {
-                try {
-                  const storyObj = JSON.parse(data.story);
-                  setStoryText(storyObj.article);
-                } catch (e) {
-                  setStoryText(data.story);
-                }
+                setStoryText(data.story.article);
                 setInputMethod('text');
                 setDisplayStoryUpload(false);
               }
