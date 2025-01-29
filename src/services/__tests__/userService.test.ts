@@ -59,6 +59,47 @@ describe('UserService', () => {
     });
   });
 
+  describe('getAllUsers', () => {
+    it('should return all users', async () => {
+      const mockUsers = [
+        mockUser,
+        {
+          ...mockUser,
+          _id: new mongoose.Types.ObjectId(),
+          email: 'test2@example.com',
+        },
+      ];
+
+      // Mock the User.find method
+      vi.spyOn(User, 'find').mockResolvedValueOnce(mockUsers as IUserDocument[]);
+
+      const result = await userService.getAllUsers();
+
+      expect(connectDB).toHaveBeenCalled();
+      expect(User.find).toHaveBeenCalledWith({});
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        id: mockUsers[0]._id!.toString(),
+        email: mockUsers[0].email,
+        firstName: mockUsers[0].firstName,
+        lastName: mockUsers[0].lastName,
+        createdAt: mockUsers[0].createdAt!.toISOString(),
+        updatedAt: mockUsers[0].updatedAt!.toISOString(),
+      });
+    });
+
+    it('should return empty array when no users exist', async () => {
+      // Mock the User.find method to return empty array
+      vi.spyOn(User, 'find').mockResolvedValueOnce([]);
+
+      const result = await userService.getAllUsers();
+
+      expect(connectDB).toHaveBeenCalled();
+      expect(User.find).toHaveBeenCalledWith({});
+      expect(result).toEqual([]);
+    });
+  });
+
   describe('exists', () => {
     it('should return true when user exists', async () => {
       vi.spyOn(User, 'findOne').mockResolvedValueOnce(mockUser as IUserDocument);
