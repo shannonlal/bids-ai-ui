@@ -52,8 +52,13 @@ describe('FrenchIdolView', () => {
     const mockContextValue = {
       displayStoryUpload,
       storyText: 'Test story',
+      inputMethod: null,
+      currentUser: null,
+      isLoading: false,
+      error: null,
       setDisplayStoryUpload: () => {},
       setStoryText: () => {},
+      setInputMethod: () => {},
     };
 
     return render(

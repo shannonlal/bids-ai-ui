@@ -20,8 +20,13 @@ describe('QuizView', () => {
         value={{
           displayStoryUpload: false,
           storyText: 'Test story',
+          inputMethod: null,
+          currentUser: null,
+          isLoading: false,
+          error: null,
           setDisplayStoryUpload: vi.fn(),
           setStoryText: vi.fn(),
+          setInputMethod: vi.fn(),
         }}
       >
         <QuizProvider initialStoryText="Test story">
@@ -46,8 +51,13 @@ describe('QuizView', () => {
         value={{
           displayStoryUpload: false,
           storyText: 'Test story',
+          inputMethod: null,
+          currentUser: null,
+          isLoading: false,
+          error: null,
           setDisplayStoryUpload,
           setStoryText: vi.fn(),
+          setInputMethod: vi.fn(),
         }}
       >
         <QuizProvider initialStoryText="Test story">

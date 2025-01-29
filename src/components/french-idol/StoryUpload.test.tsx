@@ -56,6 +56,9 @@ describe('StoryUpload', () => {
       storyText: '',
       inputMethod: null,
       setInputMethod: vi.fn(),
+      currentUser: null,
+      isLoading: false,
+      error: null,
     });
 
     vi.mocked(usePdfParser).mockReturnValue({
