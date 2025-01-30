@@ -7,6 +7,7 @@ const menuItems = [
   { label: 'Results', href: '/results' },
   { label: 'Profile', href: '/profile' },
   { label: 'Create Stories', href: '/french-idol/create' },
+  { label: 'Grade Levels', href: '/grade-levels' },
 ];
 
 export const Header: React.FC = () => {
