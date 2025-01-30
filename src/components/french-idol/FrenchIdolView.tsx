@@ -1,4 +1,5 @@
 import { useFrenchIdol } from './FrenchIdolContext';
+import { Story } from '../../types/story';
 import { StoryUpload } from './StoryUpload';
 import { QuizView } from './quiz/QuizView';
 import { QuizProvider } from './quiz/QuizContext';
@@ -6,7 +7,13 @@ import { StoryInput } from '../story/StoryInput';
 import { StoryList } from '../story/StoryList';
 
 export function FrenchIdolView() {
-  const { displayStoryUpload, storyText, stories } = useFrenchIdol();
+  const { displayStoryUpload, storyText, stories, setDisplayStoryUpload, setStoryText } =
+    useFrenchIdol();
+
+  const handleStorySelect = (story: Story) => {
+    setStoryText(story.sourceText);
+    setDisplayStoryUpload(false);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -24,7 +31,7 @@ export function FrenchIdolView() {
                 <StoryInput />
               </div>
             </div>
-            <StoryList stories={stories} />
+            <StoryList stories={stories} onStorySelect={handleStorySelect} />
           </>
         ) : (
           <QuizProvider initialStoryText={storyText}>

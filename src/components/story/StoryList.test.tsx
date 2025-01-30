@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { StoryList } from './StoryList';
 import { Story } from '../../types/story';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('StoryList', () => {
   const mockStories: Story[] = [
@@ -29,7 +29,7 @@ describe('StoryList', () => {
   ];
 
   it('renders story titles and read buttons', () => {
-    render(<StoryList stories={mockStories} />);
+    render(<StoryList stories={mockStories} onStorySelect={() => {}} />);
 
     expect(screen.getByText('Your Unread Stories')).toBeInTheDocument();
     expect(screen.getByText('Test Story 1')).toBeInTheDocument();
@@ -38,10 +38,20 @@ describe('StoryList', () => {
   });
 
   it('renders empty state message when no stories', () => {
-    render(<StoryList stories={[]} />);
+    render(<StoryList stories={[]} onStorySelect={() => {}} />);
 
     expect(screen.getByText('Your Unread Stories')).toBeInTheDocument();
     expect(screen.getByText('No unread stories available')).toBeInTheDocument();
     expect(screen.queryByText('Read')).not.toBeInTheDocument();
+  });
+
+  it('calls onStorySelect when Read button is clicked', () => {
+    const mockOnStorySelect = vi.fn();
+    render(<StoryList stories={mockStories} onStorySelect={mockOnStorySelect} />);
+
+    const readButtons = screen.getAllByText('Read');
+    fireEvent.click(readButtons[0]);
+
+    expect(mockOnStorySelect).toHaveBeenCalledWith(mockStories[0]);
   });
 });
