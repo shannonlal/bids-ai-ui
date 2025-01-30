@@ -25,10 +25,11 @@ const mockQuizContext = {
   markQuestionAnswered: () => {},
   hasMoreQuestions: () => false,
   resetQuiz: () => {},
+  isCompleted: false,
 };
 
 describe('FrenchIdolView', () => {
-  it('renders upload and paste sections when displayStoryUpload is true', () => {
+  it('renders story list when no story is selected', () => {
     render(
       <FrenchIdolContext.Provider
         value={{
@@ -49,21 +50,23 @@ describe('FrenchIdolView', () => {
           setDisplayStoryUpload: () => {},
           setStoryText: () => {},
           setInputMethod: () => {},
+          resetForm: () => {},
         }}
       >
         <FrenchIdolView />
       </FrenchIdolContext.Provider>
     );
 
-    expect(screen.getByText('Upload PDF')).toBeInTheDocument();
-    expect(screen.getByText('Paste Text')).toBeInTheDocument();
+    expect(screen.getByText('Your Stories')).toBeInTheDocument();
+    expect(screen.getByText('Your Unread Stories')).toBeInTheDocument();
+    expect(screen.getByText('No unread stories available')).toBeInTheDocument();
   });
 
-  it('renders quiz when displayStoryUpload is false', () => {
+  it('renders quiz when a story is selected', () => {
     render(
       <FrenchIdolContext.Provider
         value={{
-          displayStoryUpload: false,
+          displayStoryUpload: true,
           storyText: 'test story',
           inputMethod: null,
           currentUser: {
@@ -80,6 +83,7 @@ describe('FrenchIdolView', () => {
           setDisplayStoryUpload: () => {},
           setStoryText: () => {},
           setInputMethod: () => {},
+          resetForm: () => {},
         }}
       >
         <QuizContext.Provider value={mockQuizContext}>
@@ -88,7 +92,7 @@ describe('FrenchIdolView', () => {
       </FrenchIdolContext.Provider>
     );
 
-    expect(screen.queryByText('Upload PDF')).not.toBeInTheDocument();
-    expect(screen.queryByText('Paste Text')).not.toBeInTheDocument();
+    expect(screen.queryByText('Your Unread Stories')).not.toBeInTheDocument();
+    expect(screen.queryByText('No unread stories available')).not.toBeInTheDocument();
   });
 });

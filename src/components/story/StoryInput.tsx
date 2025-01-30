@@ -17,7 +17,11 @@ const escapeText = (text: string): string => {
     .replace(/\t/g, '\\t');
 };
 
-export const StoryInput = () => {
+interface StoryInputProps {
+  onSuccess?: () => void;
+}
+
+export const StoryInput = ({ onSuccess }: StoryInputProps) => {
   const { setStoryText, setDisplayStoryUpload, setInputMethod, currentUser } = useFrenchIdol();
   const [isLoading, setIsLoading] = useState(false);
   const [text, setText] = useState('');
@@ -67,6 +71,7 @@ export const StoryInput = () => {
                 setStoryText(data.story.article);
                 setInputMethod('text');
                 setDisplayStoryUpload(false);
+                onSuccess?.();
               }
             } catch (e) {
               setError(e instanceof Error ? e.message : 'Failed to generate story');

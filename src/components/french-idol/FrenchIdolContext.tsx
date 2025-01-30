@@ -15,6 +15,7 @@ interface FrenchIdolContextType {
   setDisplayStoryUpload: (display: boolean) => void;
   setStoryText: (text: string) => void;
   setInputMethod: (method: InputMethod) => void;
+  resetForm: () => void;
 }
 
 const defaultContext: FrenchIdolContextType = {
@@ -32,6 +33,9 @@ const defaultContext: FrenchIdolContextType = {
     throw new Error('FrenchIdolContext not initialized');
   },
   setInputMethod: () => {
+    throw new Error('FrenchIdolContext not initialized');
+  },
+  resetForm: () => {
     throw new Error('FrenchIdolContext not initialized');
   },
 };
@@ -82,6 +86,12 @@ export function FrenchIdolProvider({ children }: FrenchIdolProviderProps) {
     loadData();
   }, []);
 
+  const resetForm = () => {
+    setStoryText('');
+    setInputMethod(null);
+    setDisplayStoryUpload(true);
+  };
+
   const value = {
     displayStoryUpload,
     storyText,
@@ -93,6 +103,7 @@ export function FrenchIdolProvider({ children }: FrenchIdolProviderProps) {
     setDisplayStoryUpload,
     setStoryText,
     setInputMethod,
+    resetForm,
   };
 
   return <FrenchIdolContext.Provider value={value}>{children}</FrenchIdolContext.Provider>;
