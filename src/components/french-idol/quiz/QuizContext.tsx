@@ -12,6 +12,7 @@ interface QuizContextType {
   questionCorrections: string[];
   userEmail: string;
   storyId: string;
+  isCompleted: boolean;
   setCurrentQuestion: (question: number) => void;
   setScore: (score: number) => void;
   setStoryText: (text: string) => void;
@@ -53,6 +54,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
   const [questionCorrections, setQuestionCorrections] = useState<string[]>([]);
   const [userEmail, setUserEmail] = useState(initialUserEmail);
   const [storyId, setStoryId] = useState(initialStoryId);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   // Reset quiz state when starting a new quiz
   const resetQuiz = () => {
@@ -62,6 +64,26 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
     setQuestionScores([]);
     setQuestionResponses([]);
     setQuestionCorrections([]);
+    setIsCompleted(false);
+  };
+
+  const markStoryComplete = async () => {
+    if (userEmail && storyId && !isCompleted) {
+      try {
+        await fetch('/api/stories/markRead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userEmail,
+            storyId: storyId,
+            quizScore: score,
+            totalQuestions: questions.length,
+          }),
+        });
+      } catch (error) {
+        console.error('Error marking story as read:', error);
+      }
+    }
   };
 
   // Effect to handle story text updates
@@ -113,6 +135,13 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
       return newCorrections;
     });
 
+    // Check if this was the last question
+    const newAnsweredCount = answeredQuestions.length + 1;
+    if (newAnsweredCount === questions.length) {
+      setIsCompleted(true);
+      markStoryComplete();
+    }
+
     // Move to next question if available
     if (questionIndex < questions.length - 1) {
       setCurrentQuestion(questionIndex + 1);
@@ -134,6 +163,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
     questionCorrections,
     userEmail,
     storyId,
+    isCompleted,
     setCurrentQuestion,
     setScore,
     setStoryText,
