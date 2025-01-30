@@ -87,7 +87,10 @@ export const ResultsComponent: React.FC<ResultsComponentProps> = ({ email }) => 
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <button
-                    onClick={() => setSelectedStory(story)}
+                    onClick={() => {
+                      console.log('View Results clicked for story:', story);
+                      setSelectedStory(story);
+                    }}
                     className="text-blue-600 hover:text-blue-900"
                   >
                     View Results
@@ -106,9 +109,11 @@ export const ResultsComponent: React.FC<ResultsComponentProps> = ({ email }) => 
         </table>
       </div>
 
-      {selectedStory && (
-        <StoryQuizModal story={selectedStory} onClose={() => setSelectedStory(null)} />
-      )}
+      {selectedStory &&
+        (() => {
+          console.log('Rendering modal for story:', selectedStory);
+          return <StoryQuizModal story={selectedStory} onClose={() => setSelectedStory(null)} />;
+        })()}
     </div>
   );
 };
