@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useFrenchIdol } from './FrenchIdolContext';
 import { Story } from '../../types/story';
 import { StoryUpload } from './StoryUpload';
@@ -7,11 +8,20 @@ import { StoryInput } from '../story/StoryInput';
 import { StoryList } from '../story/StoryList';
 
 export function FrenchIdolView() {
-  const { displayStoryUpload, storyText, stories, setDisplayStoryUpload, setStoryText } =
-    useFrenchIdol();
+  const {
+    displayStoryUpload,
+    storyText,
+    stories,
+    currentUser,
+    setDisplayStoryUpload,
+    setStoryText,
+  } = useFrenchIdol();
+
+  const [selectedStoryId, setSelectedStoryId] = useState<string>('');
 
   const handleStorySelect = (story: Story) => {
     setStoryText(story.article);
+    setSelectedStoryId(story.id);
     setDisplayStoryUpload(false);
   };
 
@@ -34,7 +44,11 @@ export function FrenchIdolView() {
             <StoryList stories={stories} onStorySelect={handleStorySelect} />
           </>
         ) : (
-          <QuizProvider initialStoryText={storyText}>
+          <QuizProvider
+            initialStoryText={storyText}
+            initialUserEmail={currentUser?.email || ''}
+            initialStoryId={selectedStoryId}
+          >
             <QuizView />
           </QuizProvider>
         )}

@@ -19,10 +19,14 @@ const mockQuizContext = {
   questionScores: [],
   questionResponses: [],
   questionCorrections: [],
+  userEmail: 'test@example.com',
+  storyId: 'story-123',
   setCurrentQuestion: vi.fn(),
   setScore: vi.fn(),
   setStoryText: vi.fn(),
   setQuestions: vi.fn(),
+  setUserEmail: vi.fn(),
+  setStoryId: vi.fn(),
   markQuestionAnswered: vi.fn(),
   hasMoreQuestions: vi.fn(),
   resetQuiz: vi.fn(),
@@ -99,7 +103,9 @@ describe('QuizQuestion', () => {
     expect(mockValidateResponse).toHaveBeenCalledWith(
       defaultProps.question,
       'Paris',
-      mockQuizContext.storyText
+      mockQuizContext.storyText,
+      mockQuizContext.userEmail,
+      mockQuizContext.storyId
     );
     await waitFor(() => {
       expect(mockOnAnswered).toHaveBeenCalledWith(

@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 import { ValidateResponseApiResponse } from '../../types/api/validateResponse';
+import { answerService } from '../../services/answerService';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-key';
 
@@ -45,7 +46,7 @@ export default async function handler(
     });
   }
 
-  const { story, question, response } = req.body;
+  const { story, question, response, userEmail, storyId } = req.body;
 
   if (!story || typeof story !== 'string') {
     return res.status(400).json({
@@ -69,6 +70,24 @@ export default async function handler(
     return res.status(400).json({
       error: {
         message: 'Response field is required and must be a string',
+        code: 'INVALID_INPUT',
+      },
+    });
+  }
+
+  if (!userEmail || typeof userEmail !== 'string') {
+    return res.status(400).json({
+      error: {
+        message: 'User email is required and must be a string',
+        code: 'INVALID_INPUT',
+      },
+    });
+  }
+
+  if (!storyId || typeof storyId !== 'string') {
+    return res.status(400).json({
+      error: {
+        message: 'Story ID is required and must be a string',
         code: 'INVALID_INPUT',
       },
     });
@@ -120,10 +139,31 @@ export default async function handler(
         });
       }
 
-      return res.status(200).json({
-        score: parsedResponse.score,
-        correction: parsedResponse.correction,
-      });
+      // Save the answer using answerService
+      try {
+        const savedAnswer = await answerService.saveAnswer(
+          userEmail,
+          storyId,
+          question,
+          response,
+          parsedResponse.score,
+          parsedResponse.correction
+        );
+
+        return res.status(200).json({
+          score: parsedResponse.score,
+          correction: parsedResponse.correction,
+          savedAnswer,
+        });
+      } catch (dbError) {
+        console.error('Database error:', dbError);
+        return res.status(500).json({
+          error: {
+            message: 'Failed to save answer to database',
+            code: 'DATABASE_ERROR',
+          },
+        });
+      }
     } catch (parseError) {
       console.error('Parse error:', parseError);
       return res.status(500).json({

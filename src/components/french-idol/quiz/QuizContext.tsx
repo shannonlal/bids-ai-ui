@@ -10,10 +10,14 @@ interface QuizContextType {
   questionScores: number[];
   questionResponses: string[];
   questionCorrections: string[];
+  userEmail: string;
+  storyId: string;
   setCurrentQuestion: (question: number) => void;
   setScore: (score: number) => void;
   setStoryText: (text: string) => void;
   setQuestions: (questions: string[]) => void;
+  setUserEmail: (email: string) => void;
+  setStoryId: (id: string) => void;
   markQuestionAnswered: (
     questionIndex: number,
     grade: number,
@@ -29,9 +33,16 @@ export const QuizContext = createContext<QuizContextType | undefined>(undefined)
 interface QuizProviderProps {
   children: ReactNode;
   initialStoryText?: string;
+  initialUserEmail?: string;
+  initialStoryId?: string;
 }
 
-export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialStoryText = '' }) => {
+export const QuizProvider: React.FC<QuizProviderProps> = ({
+  children,
+  initialStoryText = '',
+  initialUserEmail = '',
+  initialStoryId = '',
+}) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [storyText, setStoryText] = useState(initialStoryText);
@@ -40,6 +51,8 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   const [questionScores, setQuestionScores] = useState<number[]>([]);
   const [questionResponses, setQuestionResponses] = useState<string[]>([]);
   const [questionCorrections, setQuestionCorrections] = useState<string[]>([]);
+  const [userEmail, setUserEmail] = useState(initialUserEmail);
+  const [storyId, setStoryId] = useState(initialStoryId);
 
   // Reset quiz state when starting a new quiz
   const resetQuiz = () => {
@@ -119,10 +132,14 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     questionScores,
     questionResponses,
     questionCorrections,
+    userEmail,
+    storyId,
     setCurrentQuestion,
     setScore,
     setStoryText,
     setQuestions,
+    setUserEmail,
+    setStoryId,
     markQuestionAnswered,
     hasMoreQuestions,
     resetQuiz,

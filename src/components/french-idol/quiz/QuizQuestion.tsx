@@ -27,7 +27,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
     setAnswer('');
   }, [question]);
   const { validateResponse, isValidating } = useValidResponse();
-  const { storyText } = useQuiz();
+  const { storyText, userEmail, storyId } = useQuiz();
   const { setDisplayStoryUpload } = useFrenchIdol();
 
   const handleSubmit = async () => {
@@ -38,7 +38,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
     try {
       setError('');
-      const result = await validateResponse(question, answer, storyText);
+      const result = await validateResponse(question, answer, storyText, userEmail, storyId);
       if (result.errorMessage) {
         setError(result.errorMessage);
         return;
