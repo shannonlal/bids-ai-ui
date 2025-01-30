@@ -1,86 +1,15 @@
-import Head from 'next/head';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
-import { Button } from '../ui-kit/Button';
-import { Dropdown } from '../ui-kit/Dropdown';
-import { IconPlus } from '../ui-kit/icons/IconPlus';
-import { StoryInput } from '../components/story/StoryInput';
-import { FrenchIdolProvider } from '../components/french-idol/FrenchIdolContext';
 
 const Home: NextPage = () => {
-  return (
-    <FrenchIdolProvider>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <Head>
-          <title>Tailwind Components Demo</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+  const router = useRouter();
 
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Tailwind Components Demo</h1>
+  useEffect(() => {
+    router.push('/french-idol');
+  }, [router]);
 
-            <div className="space-y-12">
-              {/* Story Input Section */}
-              <div className="card">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Story Input</h2>
-                <StoryInput />
-              </div>
-
-              {/* Buttons Section */}
-              <div className="card">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Buttons</h2>
-                <div className="space-x-4">
-                  <Button icon={<IconPlus />}>Create New</Button>
-                  <Button>SEE MORE</Button>
-                </div>
-              </div>
-
-              {/* Dropdown Section */}
-              <div className="card">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Dropdown</h2>
-                <Dropdown
-                  className="w-64"
-                  items={[
-                    {
-                      code: 'EN',
-                      label: 'English',
-                      onClick: () => console.log('English selected'),
-                    },
-                    {
-                      code: 'FR',
-                      label: 'Français',
-                      onClick: () => console.log('French selected'),
-                    },
-                    {
-                      code: 'ES',
-                      label: 'Español',
-                      onClick: () => console.log('Spanish selected'),
-                    },
-                    {
-                      code: 'PT',
-                      label: 'Português',
-                      onClick: () => console.log('Portuguese selected'),
-                    },
-                    {
-                      code: 'DE',
-                      label: 'Deutsch',
-                      onClick: () => console.log('German selected'),
-                    },
-                  ]}
-                />
-              </div>
-
-              {/* Input Section */}
-              <div className="card">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Input</h2>
-                <input type="text" placeholder="Type something..." className="input" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </FrenchIdolProvider>
-  );
+  return null;
 };
 
 export default Home;
