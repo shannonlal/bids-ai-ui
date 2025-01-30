@@ -1,6 +1,13 @@
 /**
  * Interface representing a Story in the frontend
  */
+export interface QuizResultData {
+  question: string;
+  score: number;
+  response: string;
+  correction: string;
+}
+
 export interface Story {
   id: string;
   userEmail: string;

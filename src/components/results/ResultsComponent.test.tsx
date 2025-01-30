@@ -23,14 +23,41 @@ describe('ResultsComponent', () => {
     },
   ];
 
+  const mockAnswers = [
+    {
+      id: '1',
+      question: 'Q1',
+      answer: 'A1',
+      score: 4,
+      correction: 'C1',
+    },
+    {
+      id: '2',
+      question: 'Q2',
+      answer: 'A2',
+      score: 4,
+      correction: 'C2',
+    },
+  ];
+
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn().mockImplementation(() =>
-      Promise.resolve({
+    let fetchCount = 0;
+    global.fetch = vi.fn().mockImplementation(() => {
+      fetchCount++;
+      // First fetch returns stories
+      if (fetchCount === 1) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ stories: mockStories }),
+        });
+      }
+      // Second fetch returns answers
+      return Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ stories: mockStories }),
-      })
-    );
+        json: () => Promise.resolve({ answers: mockAnswers }),
+      });
+    });
   });
 
   it('renders loading state initially', () => {
@@ -67,8 +94,12 @@ describe('ResultsComponent', () => {
     const viewButton = await screen.findByText('View Results');
     fireEvent.click(viewButton);
 
-    // Check if modal content is displayed
-    expect(screen.getByTestId('modal-title')).toHaveTextContent('Test Story 1');
+    // Wait for loading state
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+
+    // Wait for modal content to appear
+    const modalTitle = await screen.findByTestId('modal-title');
+    expect(modalTitle).toHaveTextContent('Test Story 1');
     expect(screen.getByRole('button', { name: '✕' })).toBeInTheDocument();
   });
 
@@ -79,11 +110,40 @@ describe('ResultsComponent', () => {
     const viewButton = await screen.findByText('View Results');
     fireEvent.click(viewButton);
 
-    // Close modal
-    const closeButton = screen.getByRole('button', { name: '✕' });
+    // Wait for modal content to appear
+    const closeButton = await screen.findByRole('button', { name: '✕' });
     fireEvent.click(closeButton);
 
     // Check if modal is closed
     expect(screen.queryByRole('button', { name: '✕' })).not.toBeInTheDocument();
+  });
+
+  it('shows error modal when answers fetch fails', async () => {
+    // Override fetch mock for this test
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(() =>
+        // First fetch returns stories
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ stories: mockStories }),
+        })
+      )
+      .mockImplementationOnce(() =>
+        // Second fetch fails
+        Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({ message: 'Failed to fetch answers' }),
+        })
+      );
+
+    render(<ResultsComponent email="test@example.com" />);
+
+    // Wait for the button to appear and click it
+    const viewButton = await screen.findByText('View Results');
+    fireEvent.click(viewButton);
+
+    // Check if error message is displayed
+    expect(await screen.findByText('Failed to fetch answers')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Story } from '../../types/story';
+import { Story, QuizResultData } from '../../types/story';
 import { StoryQuizModal } from './StoryQuizModal';
 
 interface ResultsComponentProps {
@@ -9,8 +9,11 @@ interface ResultsComponentProps {
 export const ResultsComponent: React.FC<ResultsComponentProps> = ({ email }) => {
   const [stories, setStories] = useState<Story[]>([]);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
+  const [storyAnswers, setStoryAnswers] = useState<QuizResultData[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingAnswers, setLoadingAnswers] = useState(false);
   const [, setError] = useState<string | null>(null);
+  const [answerError, setAnswerError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -87,13 +90,40 @@ export const ResultsComponent: React.FC<ResultsComponentProps> = ({ email }) => 
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       console.log('View Results clicked for story:', story);
                       setSelectedStory(story);
+                      setLoadingAnswers(true);
+                      setAnswerError(null);
+                      setStoryAnswers(null);
+
+                      try {
+                        const response = await fetch(
+                          `/api/stories/getStoryAnswers?storyId=${encodeURIComponent(
+                            story.id
+                          )}&email=${encodeURIComponent(email)}`
+                        );
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                          throw new Error(data.message || 'Failed to fetch answers');
+                        }
+
+                        setStoryAnswers(data.answers);
+                      } catch (error) {
+                        console.error('Error fetching answers:', error);
+                        setAnswerError(
+                          error instanceof Error ? error.message : 'An error occurred'
+                        );
+                        setSelectedStory(null);
+                      } finally {
+                        setLoadingAnswers(false);
+                      }
                     }}
                     className="text-blue-600 hover:text-blue-900"
+                    disabled={loadingAnswers}
                   >
-                    View Results
+                    {loadingAnswers ? 'Loading...' : 'View Results'}
                   </button>
                 </td>
               </tr>
@@ -109,11 +139,31 @@ export const ResultsComponent: React.FC<ResultsComponentProps> = ({ email }) => 
         </table>
       </div>
 
-      {selectedStory &&
-        (() => {
-          console.log('Rendering modal for story:', selectedStory);
-          return <StoryQuizModal story={selectedStory} onClose={() => setSelectedStory(null)} />;
-        })()}
+      {answerError && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100]">
+          <div className="bg-white rounded-lg p-6 max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Error</h2>
+            <p className="text-red-600">{answerError}</p>
+            <button
+              onClick={() => setAnswerError(null)}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {selectedStory && !loadingAnswers && !answerError && (
+        <StoryQuizModal
+          story={selectedStory}
+          answers={storyAnswers || undefined}
+          onClose={() => {
+            setSelectedStory(null);
+            setStoryAnswers(null);
+          }}
+        />
+      )}
     </div>
   );
 };
