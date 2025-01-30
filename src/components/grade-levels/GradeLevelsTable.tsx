@@ -7,7 +7,7 @@ interface GradeLevelsTableProps {
 
 type SortField = keyof Pick<
   GradeLevel,
-  'grade' | 'levelName' | 'averageAge' | 'numberOfQuestions' | 'storyWordCount'
+  'grade' | 'levelName' | 'averageAge' | 'instructions' | 'storyWordCount'
 >;
 
 export const GradeLevelsTable: React.FC<GradeLevelsTableProps> = ({ gradeLevels }) => {
@@ -65,10 +65,10 @@ export const GradeLevelsTable: React.FC<GradeLevelsTableProps> = ({ gradeLevels 
               Average Age {renderSortIcon('averageAge')}
             </th>
             <th
-              onClick={() => handleSort('numberOfQuestions')}
+              onClick={() => handleSort('instructions')}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
-              Questions {renderSortIcon('numberOfQuestions')}
+              Instructions {renderSortIcon('instructions')}
             </th>
             <th
               onClick={() => handleSort('storyWordCount')}
@@ -88,9 +88,7 @@ export const GradeLevelsTable: React.FC<GradeLevelsTableProps> = ({ gradeLevels 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {level.averageAge}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {level.numberOfQuestions}
-              </td>
+              <td className="px-6 py-4 text-sm text-gray-900">{level.instructions}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {level.storyWordCount}
               </td>
