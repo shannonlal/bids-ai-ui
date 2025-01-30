@@ -9,6 +9,7 @@ export interface Answer {
   answer: string;
   score: number;
   correction: string;
+  suggestedAnswer: string;
   createdAt: string;
   updatedAt: string;
 }

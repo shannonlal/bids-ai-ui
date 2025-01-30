@@ -9,6 +9,7 @@ export interface ValidateResponseRequest {
 export interface ValidateResponseSuccess {
   score: number;
   correction: string;
+  suggestedAnswer: string;
   savedAnswer: {
     id: string;
     userEmail: string;
@@ -17,6 +18,7 @@ export interface ValidateResponseSuccess {
     answer: string;
     score: number;
     correction: string;
+    suggestedAnswer: string;
     createdAt: string;
     updatedAt: string;
   };

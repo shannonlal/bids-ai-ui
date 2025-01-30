@@ -22,7 +22,8 @@ export class AnswerService {
     question: string,
     answer: string,
     score: number,
-    correction: string
+    correction: string,
+    suggestedAnswer: string
   ): Promise<AnswerType> {
     await connectDB();
     console.log('Creating new answer for user:', email);
@@ -35,6 +36,7 @@ export class AnswerService {
       answer,
       score,
       correction,
+      suggestedAnswer,
       createdAt: now,
       updatedAt: now,
     });

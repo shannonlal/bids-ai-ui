@@ -12,6 +12,7 @@ export interface IAnswerDocument extends Document {
   answer: string;
   score: number;
   correction: string;
+  suggestedAnswer: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -50,6 +51,10 @@ const answerSchema = new Schema<IAnswerDocument>(
       type: String,
       required: true,
     },
+    suggestedAnswer: {
+      type: String,
+      required: true,
+    },
     createdAt: {
       type: String,
       required: true,
@@ -83,6 +88,7 @@ export function mapAnswerToDTO(answer: IAnswerDocument): AnswerType {
     answer: answer.answer,
     score: answer.score,
     correction: answer.correction,
+    suggestedAnswer: answer.suggestedAnswer,
     createdAt: answer.createdAt,
     updatedAt: answer.updatedAt,
   };

@@ -30,7 +30,8 @@ Here are key points for grammar:
 Provide your response in the following JSON format:
 {
   "score": (number between 0 and 5),
-  "correction": "(detailed explanation in French of the grade, including what was done well and what could be improved. Even for perfect scores, provide encouraging feedback.  No more than 30 words)"
+  "correction": "(detailed explanation in French of the grade, including what was done well and what could be improved. Even for perfect scores, provide encouraging feedback.  No more than 30 words)",
+  "suggestedAnswer": "(write a model answer in French that would receive a perfect score. Keep it concise but complete.)"
 }`;
 
 export default async function handler(
@@ -107,7 +108,7 @@ export default async function handler(
         },
       ],
       temperature: 0.3,
-      max_tokens: 100,
+      max_tokens: 250, // Increased to accommodate the suggested answer
     });
 
     const aiResponse = completion.choices[0]?.message?.content;
@@ -128,6 +129,7 @@ export default async function handler(
       if (
         typeof parsedResponse.score !== 'number' ||
         typeof parsedResponse.correction !== 'string' ||
+        typeof parsedResponse.suggestedAnswer !== 'string' ||
         parsedResponse.score < 0 ||
         parsedResponse.score > 5
       ) {
@@ -147,12 +149,14 @@ export default async function handler(
           question,
           response,
           parsedResponse.score,
-          parsedResponse.correction
+          parsedResponse.correction,
+          parsedResponse.suggestedAnswer
         );
 
         return res.status(200).json({
           score: parsedResponse.score,
           correction: parsedResponse.correction,
+          suggestedAnswer: parsedResponse.suggestedAnswer,
           savedAnswer,
         });
       } catch (dbError) {

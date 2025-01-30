@@ -47,6 +47,7 @@ describe('validateResponse API', () => {
     answer: 'test response',
     score: 4.5,
     correction: 'Excellent travail!',
+    suggestedAnswer: 'La réponse modèle ici.',
     createdAt: '2024-01-29T12:00:00.000Z',
     updatedAt: '2024-01-29T12:00:00.000Z',
   };
@@ -218,6 +219,7 @@ describe('validateResponse API', () => {
               score: 4.5,
               correction:
                 'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
+              suggestedAnswer: 'La réponse modèle ici.',
             }),
           },
         },
@@ -243,7 +245,8 @@ describe('validateResponse API', () => {
       'test question',
       'test response',
       4.5,
-      'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!'
+      'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
+      'La réponse modèle ici.'
     );
 
     expect(statusMock).toHaveBeenCalledWith(200);
@@ -252,6 +255,7 @@ describe('validateResponse API', () => {
       correction:
         'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
       savedAnswer: mockAnswer,
+      suggestedAnswer: 'La réponse modèle ici.',
     });
   });
 
@@ -263,6 +267,7 @@ describe('validateResponse API', () => {
             content: JSON.stringify({
               score: 4.5,
               correction: 'Excellent travail!',
+              suggestedAnswer: 'La réponse modèle ici.',
             }),
           },
         },
