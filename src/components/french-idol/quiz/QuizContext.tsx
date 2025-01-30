@@ -78,6 +78,9 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
             storyId: storyId,
             quizScore: score,
             totalQuestions: questions.length,
+            questions,
+            questionResponses,
+            questionCorrections,
           }),
         });
       } catch (error) {

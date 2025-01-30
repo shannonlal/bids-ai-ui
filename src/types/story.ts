@@ -10,6 +10,9 @@ export interface Story {
   read: boolean;
   quizScore?: number | null;
   totalQuestions?: number | null;
+  questionResponses?: string[] | null;
+  questionCorrections?: string[] | null;
+  questions?: string[] | null;
   createdAt: string;
   updatedAt: string;
 }

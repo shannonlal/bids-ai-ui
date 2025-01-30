@@ -13,6 +13,9 @@ export interface IStoryDocument extends Document {
   read: boolean;
   quizScore: number | null;
   totalQuestions: number | null;
+  questionResponses: string[] | null;
+  questionCorrections: string[] | null;
+  questions: string[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -56,6 +59,21 @@ const storySchema = new Schema<IStoryDocument>(
       required: false,
       default: null,
     },
+    questionResponses: {
+      type: [String],
+      required: false,
+      default: null,
+    },
+    questionCorrections: {
+      type: [String],
+      required: false,
+      default: null,
+    },
+    questions: {
+      type: [String],
+      required: false,
+      default: null,
+    },
     createdAt: {
       type: String,
       required: true,
@@ -90,6 +108,9 @@ export function mapStoryToDTO(story: IStoryDocument): StoryType {
     read: story.read,
     quizScore: story.quizScore,
     totalQuestions: story.totalQuestions,
+    questionResponses: story.questionResponses,
+    questionCorrections: story.questionCorrections,
+    questions: story.questions,
     createdAt: story.createdAt,
     updatedAt: story.updatedAt,
   };

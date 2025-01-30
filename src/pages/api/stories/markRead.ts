@@ -7,7 +7,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { email, storyId, quizScore, totalQuestions } = req.body;
+    const {
+      email,
+      storyId,
+      quizScore,
+      totalQuestions,
+      questions,
+      questionResponses,
+      questionCorrections,
+    } = req.body;
 
     if (!email || !storyId || typeof quizScore !== 'number' || typeof totalQuestions !== 'number') {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -17,7 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email,
       storyId,
       quizScore,
-      totalQuestions
+      totalQuestions,
+      questions,
+      questionResponses,
+      questionCorrections
     );
     res.status(200).json(updatedStory);
   } catch (error) {

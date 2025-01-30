@@ -72,7 +72,10 @@ export class StoryService {
     email: string,
     id: string,
     quizScore: number,
-    totalQuestions: number
+    totalQuestions: number,
+    questions: string[],
+    questionResponses: string[],
+    questionCorrections: string[]
   ): Promise<StoryType> {
     await connectDB();
     console.log('Marking story as read with score:', id, 'for user:', email);
@@ -89,6 +92,9 @@ export class StoryService {
     story.read = true;
     story.quizScore = quizScore;
     story.totalQuestions = totalQuestions;
+    story.questions = questions;
+    story.questionResponses = questionResponses;
+    story.questionCorrections = questionCorrections;
     story.updatedAt = new Date().toISOString();
 
     const updatedStory = await story.save();
