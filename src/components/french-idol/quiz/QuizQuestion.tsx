@@ -3,6 +3,7 @@ import { TextInput } from '../../../ui-kit/TextInput';
 import { Button } from '../../../ui-kit/Button';
 import { useValidResponse } from '../../../hooks/useValidResponse';
 import { useQuiz } from './QuizContext';
+import { useFrenchIdol } from '../FrenchIdolContext';
 
 interface QuizQuestionProps {
   question: string;
@@ -27,6 +28,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
   }, [question]);
   const { validateResponse, isValidating } = useValidResponse();
   const { storyText } = useQuiz();
+  const { setDisplayStoryUpload } = useFrenchIdol();
 
   const handleSubmit = async () => {
     if (!answer.trim()) {
@@ -83,9 +85,14 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
           </span>
         </div>
       </div>
-      <Button onClick={handleSubmit} disabled={isValidating}>
-        {isValidating ? 'Validating...' : 'Submit'}
-      </Button>
+      <div className="flex gap-4">
+        <Button onClick={() => setDisplayStoryUpload(true)} variant="secondary">
+          Back
+        </Button>
+        <Button onClick={handleSubmit} disabled={isValidating}>
+          {isValidating ? 'Validating...' : 'Submit'}
+        </Button>
+      </div>
     </div>
   );
 };

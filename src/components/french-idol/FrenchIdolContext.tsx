@@ -1,5 +1,6 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { User } from '../../types/user';
+import { Story } from '../../types/story';
 
 type InputMethod = 'upload' | 'text' | null;
 
@@ -10,6 +11,7 @@ interface FrenchIdolContextType {
   currentUser: User | null;
   isLoading: boolean;
   error: string | null;
+  stories: Story[];
   setDisplayStoryUpload: (display: boolean) => void;
   setStoryText: (text: string) => void;
   setInputMethod: (method: InputMethod) => void;
@@ -22,6 +24,7 @@ const defaultContext: FrenchIdolContextType = {
   currentUser: null,
   isLoading: false,
   error: null,
+  stories: [],
   setDisplayStoryUpload: () => {
     throw new Error('FrenchIdolContext not initialized');
   },
@@ -46,27 +49,37 @@ export function FrenchIdolProvider({ children }: FrenchIdolProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stories, setStories] = useState<Story[]>([]);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/users/getByEmail?email=vincent@gmail.com`);
-        if (!response.ok) {
+        // Load user
+        const userResponse = await fetch(`/api/users/getByEmail?email=vincent@gmail.com`);
+        if (!userResponse.ok) {
           throw new Error('Failed to fetch user');
         }
-        const data = await response.json();
-        setCurrentUser(data.user);
+        const userData = await userResponse.json();
+        setCurrentUser(userData.user);
+
+        // Load unread stories
+        const storiesResponse = await fetch(`/api/stories/list?email=vincent@gmail.com&read=false`);
+        if (!storiesResponse.ok) {
+          throw new Error('Failed to fetch stories');
+        }
+        const storiesData = await storiesResponse.json();
+        setStories(storiesData.stories);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load user');
-        console.error('Error loading user:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+        console.error('Error loading data:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadUser();
+    loadData();
   }, []);
 
   const value = {
@@ -76,6 +89,7 @@ export function FrenchIdolProvider({ children }: FrenchIdolProviderProps) {
     currentUser,
     isLoading,
     error,
+    stories,
     setDisplayStoryUpload,
     setStoryText,
     setInputMethod,

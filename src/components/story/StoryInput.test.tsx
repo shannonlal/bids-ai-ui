@@ -12,6 +12,7 @@ const mockFrenchIdolContext = {
   currentUser: null,
   isLoading: false,
   error: null,
+  stories: [],
   setDisplayStoryUpload: vi.fn(),
   setStoryText: vi.fn(),
   setInputMethod: vi.fn(),

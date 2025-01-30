@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuizQuestion } from './QuizQuestion';
 import * as useValidResponseModule from '../../../hooks/useValidResponse';
 import { QuizContext } from './QuizContext';
+import { FrenchIdolProvider } from '../FrenchIdolContext';
 
 vi.mock('../../../hooks/useValidResponse', () => ({
   useValidResponse: vi.fn(),
@@ -27,8 +28,30 @@ const mockQuizContext = {
   resetQuiz: vi.fn(),
 };
 
+const mockFrenchIdolContext = {
+  displayStoryUpload: false,
+  setDisplayStoryUpload: vi.fn(),
+  storyText: '',
+  setStoryText: vi.fn(),
+  inputMethod: null,
+  setInputMethod: vi.fn(),
+  currentUser: null,
+  isLoading: false,
+  error: null,
+  stories: [],
+};
+
+vi.mock('../FrenchIdolContext', () => ({
+  useFrenchIdol: () => mockFrenchIdolContext,
+  FrenchIdolProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const renderWithQuizContext = (ui: React.ReactElement) => {
-  return render(<QuizContext.Provider value={mockQuizContext}>{ui}</QuizContext.Provider>);
+  return render(
+    <FrenchIdolProvider>
+      <QuizContext.Provider value={mockQuizContext}>{ui}</QuizContext.Provider>
+    </FrenchIdolProvider>
+  );
 };
 
 describe('QuizQuestion', () => {
@@ -114,5 +137,12 @@ describe('QuizQuestion', () => {
     fireEvent.change(input, { target: { value: '   ' } });
     fireEvent.click(submitButton);
     expect(mockValidateResponse).not.toHaveBeenCalled();
+  });
+
+  it('navigates back when back button is clicked', () => {
+    renderWithQuizContext(<QuizQuestion {...defaultProps} />);
+    const backButton = screen.getByText('Back');
+    fireEvent.click(backButton);
+    expect(mockFrenchIdolContext.setDisplayStoryUpload).toHaveBeenCalledWith(true);
   });
 });

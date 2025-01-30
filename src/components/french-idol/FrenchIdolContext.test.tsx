@@ -1,4 +1,3 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
@@ -34,10 +33,17 @@ describe('FrenchIdolContext', () => {
   });
 
   it('provides displayStoryUpload state with correct initial value', async () => {
+    // Mock user fetch
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ user: { email: 'vincent@gmail.com' } }),
     });
+    // Mock stories fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ stories: [] }),
+    });
+
     render(
       <FrenchIdolProvider>
         <TestComponent />
@@ -49,10 +55,17 @@ describe('FrenchIdolContext', () => {
   });
 
   it('allows updating displayStoryUpload state', async () => {
+    // Mock user fetch
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ user: { email: 'vincent@gmail.com' } }),
     });
+    // Mock stories fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ stories: [] }),
+    });
+
     render(
       <FrenchIdolProvider>
         <TestComponent />
@@ -79,9 +92,15 @@ describe('FrenchIdolContext', () => {
       updatedAt: '2024-01-29',
     };
 
+    // Mock user fetch
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ user: mockUser }),
+    });
+    // Mock stories fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ stories: [] }),
     });
 
     render(
@@ -102,9 +121,15 @@ describe('FrenchIdolContext', () => {
   });
 
   it('handles user loading error', async () => {
+    // Mock user fetch error
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
+    });
+    // Mock stories fetch (even though it won't be called due to user fetch error)
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ stories: [] }),
     });
 
     render(
