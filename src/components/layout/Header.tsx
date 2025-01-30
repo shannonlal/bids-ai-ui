@@ -5,7 +5,7 @@ import { MenuDropdown } from './MenuDropdown';
 const menuItems = [
   { label: 'Train', href: '/french-idol' },
   { label: 'Results', href: '#' },
-  { label: 'Profile', href: '#' },
+  { label: 'Profile', href: '/profile' },
   { label: 'Create Stories', href: '#' },
 ];
 
