@@ -8,6 +8,8 @@ export interface Story {
   title: string;
   article: string;
   read: boolean;
+  quizScore?: number | null;
+  totalQuestions?: number | null;
   createdAt: string;
   updatedAt: string;
 }

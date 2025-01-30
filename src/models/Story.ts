@@ -11,6 +11,8 @@ export interface IStoryDocument extends Document {
   title: string;
   article: string;
   read: boolean;
+  quizScore: number | null;
+  totalQuestions: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +46,16 @@ const storySchema = new Schema<IStoryDocument>(
       required: true,
       default: false,
     },
+    quizScore: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    totalQuestions: {
+      type: Number,
+      required: false,
+      default: null,
+    },
     createdAt: {
       type: String,
       required: true,
@@ -76,6 +88,8 @@ export function mapStoryToDTO(story: IStoryDocument): StoryType {
     title: story.title,
     article: story.article,
     read: story.read,
+    quizScore: story.quizScore,
+    totalQuestions: story.totalQuestions,
     createdAt: story.createdAt,
     updatedAt: story.updatedAt,
   };

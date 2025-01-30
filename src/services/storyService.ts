@@ -60,15 +60,22 @@ export class StoryService {
   }
 
   /**
-   * Marks a story as read
+   * Marks a story as read and saves the quiz score
    * @param email - The user's email address
    * @param id - The story ID
+   * @param quizScore - The score achieved in the quiz
+   * @param totalQuestions - The total number of questions in the quiz
    * @returns The updated story data transformed to frontend type
    * @throws Error if story is not found or doesn't belong to the user
    */
-  async markStoryRead(email: string, id: string): Promise<StoryType> {
+  async markStoryRead(
+    email: string,
+    id: string,
+    quizScore: number,
+    totalQuestions: number
+  ): Promise<StoryType> {
     await connectDB();
-    console.log('Marking story as read:', id, 'for user:', email);
+    console.log('Marking story as read with score:', id, 'for user:', email);
 
     const story = await Story.findOne({
       _id: id,
@@ -80,6 +87,8 @@ export class StoryService {
     }
 
     story.read = true;
+    story.quizScore = quizScore;
+    story.totalQuestions = totalQuestions;
     story.updatedAt = new Date().toISOString();
 
     const updatedStory = await story.save();
