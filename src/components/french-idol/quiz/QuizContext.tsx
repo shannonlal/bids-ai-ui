@@ -9,11 +9,22 @@ interface QuizContextType {
   answeredQuestions: number[];
   questionScores: number[];
   questionResponses: string[];
+  questionCorrections: string[];
+  userEmail: string;
+  storyId: string;
+  isCompleted: boolean;
   setCurrentQuestion: (question: number) => void;
   setScore: (score: number) => void;
   setStoryText: (text: string) => void;
   setQuestions: (questions: string[]) => void;
-  markQuestionAnswered: (questionIndex: number, grade: number, response: string) => void;
+  setUserEmail: (email: string) => void;
+  setStoryId: (id: string) => void;
+  markQuestionAnswered: (
+    questionIndex: number,
+    grade: number,
+    response: string,
+    correction: string
+  ) => void;
   hasMoreQuestions: () => boolean;
   resetQuiz: () => void;
 }
@@ -23,9 +34,16 @@ export const QuizContext = createContext<QuizContextType | undefined>(undefined)
 interface QuizProviderProps {
   children: ReactNode;
   initialStoryText?: string;
+  initialUserEmail?: string;
+  initialStoryId?: string;
 }
 
-export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialStoryText = '' }) => {
+export const QuizProvider: React.FC<QuizProviderProps> = ({
+  children,
+  initialStoryText = '',
+  initialUserEmail = '',
+  initialStoryId = '',
+}) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [storyText, setStoryText] = useState(initialStoryText);
@@ -33,6 +51,10 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
   const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([]);
   const [questionScores, setQuestionScores] = useState<number[]>([]);
   const [questionResponses, setQuestionResponses] = useState<string[]>([]);
+  const [questionCorrections, setQuestionCorrections] = useState<string[]>([]);
+  const [userEmail, setUserEmail] = useState(initialUserEmail);
+  const [storyId, setStoryId] = useState(initialStoryId);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   // Reset quiz state when starting a new quiz
   const resetQuiz = () => {
@@ -41,6 +63,30 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     setAnsweredQuestions([]);
     setQuestionScores([]);
     setQuestionResponses([]);
+    setQuestionCorrections([]);
+    setIsCompleted(false);
+  };
+
+  const markStoryComplete = async () => {
+    if (userEmail && storyId && !isCompleted) {
+      try {
+        await fetch('/api/stories/markRead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userEmail,
+            storyId: storyId,
+            quizScore: score,
+            totalQuestions: questions.length,
+            questions,
+            questionResponses,
+            questionCorrections,
+          }),
+        });
+      } catch (error) {
+        console.error('Error marking story as read:', error);
+      }
+    }
   };
 
   // Effect to handle story text updates
@@ -63,7 +109,12 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     loadQuestions();
   }, [storyText]);
 
-  const markQuestionAnswered = (questionIndex: number, grade: number, response: string) => {
+  const markQuestionAnswered = (
+    questionIndex: number,
+    grade: number,
+    response: string,
+    correction: string
+  ) => {
     setAnsweredQuestions(prev => {
       if (prev.includes(questionIndex)) {
         return prev; // Prevent answering the same question multiple times
@@ -81,6 +132,18 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
       newResponses[questionIndex] = response;
       return newResponses;
     });
+    setQuestionCorrections(prev => {
+      const newCorrections = [...prev];
+      newCorrections[questionIndex] = correction;
+      return newCorrections;
+    });
+
+    // Check if this was the last question
+    const newAnsweredCount = answeredQuestions.length + 1;
+    if (newAnsweredCount === questions.length) {
+      setIsCompleted(true);
+      markStoryComplete();
+    }
 
     // Move to next question if available
     if (questionIndex < questions.length - 1) {
@@ -100,10 +163,16 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children, initialSto
     answeredQuestions,
     questionScores,
     questionResponses,
+    questionCorrections,
+    userEmail,
+    storyId,
+    isCompleted,
     setCurrentQuestion,
     setScore,
     setStoryText,
     setQuestions,
+    setUserEmail,
+    setStoryId,
     markQuestionAnswered,
     hasMoreQuestions,
     resetQuiz,

@@ -1,9 +1,12 @@
+import { Story } from '../story';
+
 export interface GenerateStoryRequest {
   text: string;
+  email: string;
 }
 
 export interface GenerateStoryResponse {
-  story: string;
+  story: Story;
   error?: never;
 }
 

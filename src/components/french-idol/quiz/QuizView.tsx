@@ -16,14 +16,19 @@ export const QuizView: React.FC = () => {
     answeredQuestions,
     questionScores,
     questionResponses,
+    questionCorrections,
   } = useQuiz();
-  const { setDisplayStoryUpload } = useFrenchIdol();
+  const { setDisplayStoryUpload, isLoading, error } = useFrenchIdol();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
       <div className="max-w-2xl w-full bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">French Idol Quiz</h1>
-        {hasMoreQuestions() && (
+
+        {isLoading && <div className="text-center text-gray-600">Loading...</div>}
+        {error && <div className="text-center text-red-500">{error}</div>}
+
+        {!isLoading && !error && hasMoreQuestions() && (
           <>
             <p className="text-gray-600 mb-4">
               Welcome to the French Idol Quiz! Test your knowledge and improve your French language
@@ -43,7 +48,8 @@ export const QuizView: React.FC = () => {
             </div>
           </>
         )}
-        {questions.length > 0 && (
+
+        {!isLoading && !error && questions.length > 0 && (
           <div className="mt-6 mb-6">
             {hasMoreQuestions() ? (
               <QuizQuestion
@@ -58,6 +64,7 @@ export const QuizView: React.FC = () => {
                     question,
                     score: questionScores[index] || 0,
                     response: questionResponses[index] || '',
+                    correction: questionCorrections[index] || '',
                   }))}
                 />
                 <div className="text-center">

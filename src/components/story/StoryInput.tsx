@@ -17,8 +17,12 @@ const escapeText = (text: string): string => {
     .replace(/\t/g, '\\t');
 };
 
-export const StoryInput = () => {
-  const { setStoryText, setDisplayStoryUpload, setInputMethod } = useFrenchIdol();
+interface StoryInputProps {
+  onSuccess?: () => void;
+}
+
+export const StoryInput = ({ onSuccess }: StoryInputProps) => {
+  const { currentUser } = useFrenchIdol();
   const [isLoading, setIsLoading] = useState(false);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
@@ -51,7 +55,10 @@ export const StoryInput = () => {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ text: escapeText(text) }),
+                body: JSON.stringify({
+                  text: escapeText(text),
+                  email: currentUser?.email || '',
+                }),
               });
 
               const data: GenerateStoryApiResponse = await response.json();
@@ -61,14 +68,7 @@ export const StoryInput = () => {
               }
 
               if (data.story) {
-                try {
-                  const storyObj = JSON.parse(data.story);
-                  setStoryText(storyObj.article);
-                } catch (e) {
-                  setStoryText(data.story);
-                }
-                setInputMethod('text');
-                setDisplayStoryUpload(false);
+                onSuccess?.();
               }
             } catch (e) {
               setError(e instanceof Error ? e.message : 'Failed to generate story');
@@ -78,7 +78,7 @@ export const StoryInput = () => {
           }}
           disabled={isLoading}
         >
-          {isLoading ? 'Processing...' : 'Start Practice'}
+          {isLoading ? 'Processing...' : 'Create Story'}
         </Button>
       </div>
     </div>

@@ -3,11 +3,12 @@ import { TextInput } from '../../../ui-kit/TextInput';
 import { Button } from '../../../ui-kit/Button';
 import { useValidResponse } from '../../../hooks/useValidResponse';
 import { useQuiz } from './QuizContext';
+import { useFrenchIdol } from '../FrenchIdolContext';
 
 interface QuizQuestionProps {
   question: string;
   questionIndex: number;
-  onAnswered: (index: number, grade: number, response: string) => void;
+  onAnswered: (index: number, grade: number, response: string, correction: string) => void;
 }
 
 export const QuizQuestion: React.FC<QuizQuestionProps> = ({
@@ -26,7 +27,8 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
     setAnswer('');
   }, [question]);
   const { validateResponse, isValidating } = useValidResponse();
-  const { storyText } = useQuiz();
+  const { storyText, userEmail, storyId } = useQuiz();
+  const { setDisplayStoryUpload } = useFrenchIdol();
 
   const handleSubmit = async () => {
     if (!answer.trim()) {
@@ -36,7 +38,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
     try {
       setError('');
-      const result = await validateResponse(question, answer, storyText);
+      const result = await validateResponse(question, answer, storyText, userEmail, storyId);
       if (result.errorMessage) {
         setError(result.errorMessage);
         return;
@@ -44,7 +46,7 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
       const questionGrade = result.grade || 0;
       setGrade(questionGrade);
-      onAnswered(questionIndex, questionGrade, answer);
+      onAnswered(questionIndex, questionGrade, answer, result.correction || '');
       setAnswer('');
     } catch (err) {
       setError(
@@ -83,9 +85,14 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
           </span>
         </div>
       </div>
-      <Button onClick={handleSubmit} disabled={isValidating}>
-        {isValidating ? 'Validating...' : 'Submit'}
-      </Button>
+      <div className="flex gap-4">
+        <Button onClick={() => setDisplayStoryUpload(true)} variant="secondary">
+          Back
+        </Button>
+        <Button onClick={handleSubmit} disabled={isValidating}>
+          {isValidating ? 'Validating...' : 'Submit'}
+        </Button>
+      </div>
     </div>
   );
 };

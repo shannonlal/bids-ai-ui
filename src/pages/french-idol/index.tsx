@@ -1,5 +1,5 @@
-import { FrenchIdolProvider } from '../components/french-idol/FrenchIdolContext';
-import { FrenchIdolView } from '../components/french-idol/FrenchIdolView';
+import { FrenchIdolProvider } from '../../components/french-idol/FrenchIdolContext';
+import { FrenchIdolView } from '../../components/french-idol/FrenchIdolView';
 
 export default function FrenchIdol() {
   return (

@@ -3,14 +3,32 @@ import { ValidateResponseApiResponse } from '../types/api/validateResponse';
 
 export interface ValidationResult {
   grade: number;
+  correction?: string;
   errorMessage?: string;
+  savedAnswer?: {
+    id: string;
+    userEmail: string;
+    storyId: string;
+    question: string;
+    answer: string;
+    score: number;
+    correction: string;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
 export const useValidResponse = () => {
   const [isValidating, setIsValidating] = useState(false);
 
   const validateResponse = useCallback(
-    async (question: string, userInput: string, story: string): Promise<ValidationResult> => {
+    async (
+      question: string,
+      userInput: string,
+      story: string,
+      userEmail: string,
+      storyId: string
+    ): Promise<ValidationResult> => {
       setIsValidating(true);
       try {
         const response = await fetch('/api/validateResponse', {
@@ -22,6 +40,8 @@ export const useValidResponse = () => {
             story,
             question,
             response: userInput,
+            userEmail,
+            storyId,
           }),
         });
 
@@ -33,6 +53,8 @@ export const useValidResponse = () => {
 
         return {
           grade: data.score,
+          correction: data.correction,
+          savedAnswer: data.savedAnswer,
         };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to validate response';

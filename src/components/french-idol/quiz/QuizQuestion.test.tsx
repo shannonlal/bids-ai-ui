@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuizQuestion } from './QuizQuestion';
 import * as useValidResponseModule from '../../../hooks/useValidResponse';
 import { QuizContext } from './QuizContext';
+import { FrenchIdolProvider } from '../FrenchIdolContext';
 
 vi.mock('../../../hooks/useValidResponse', () => ({
   useValidResponse: vi.fn(),
@@ -17,17 +18,44 @@ const mockQuizContext = {
   answeredQuestions: [],
   questionScores: [],
   questionResponses: [],
+  questionCorrections: [],
+  userEmail: 'test@example.com',
+  storyId: 'story-123',
   setCurrentQuestion: vi.fn(),
   setScore: vi.fn(),
   setStoryText: vi.fn(),
   setQuestions: vi.fn(),
+  setUserEmail: vi.fn(),
+  setStoryId: vi.fn(),
   markQuestionAnswered: vi.fn(),
   hasMoreQuestions: vi.fn(),
   resetQuiz: vi.fn(),
 };
 
+const mockFrenchIdolContext = {
+  displayStoryUpload: false,
+  setDisplayStoryUpload: vi.fn(),
+  storyText: '',
+  setStoryText: vi.fn(),
+  inputMethod: null,
+  setInputMethod: vi.fn(),
+  currentUser: null,
+  isLoading: false,
+  error: null,
+  stories: [],
+};
+
+vi.mock('../FrenchIdolContext', () => ({
+  useFrenchIdol: () => mockFrenchIdolContext,
+  FrenchIdolProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const renderWithQuizContext = (ui: React.ReactElement) => {
-  return render(<QuizContext.Provider value={mockQuizContext}>{ui}</QuizContext.Provider>);
+  return render(
+    <FrenchIdolProvider>
+      <QuizContext.Provider value={mockQuizContext}>{ui}</QuizContext.Provider>
+    </FrenchIdolProvider>
+  );
 };
 
 describe('QuizQuestion', () => {
@@ -61,7 +89,10 @@ describe('QuizQuestion', () => {
   });
 
   it('validates answer and shows result when submit button is clicked', async () => {
-    mockValidateResponse.mockResolvedValueOnce({ grade: 5 });
+    mockValidateResponse.mockResolvedValueOnce({
+      grade: 5,
+      correction: 'Excellent! Votre réponse est parfaite.',
+    });
     renderWithQuizContext(<QuizQuestion {...defaultProps} />);
     const input = screen.getByPlaceholderText('Enter your answer...');
     const submitButton = screen.getByText('Submit');
@@ -72,10 +103,17 @@ describe('QuizQuestion', () => {
     expect(mockValidateResponse).toHaveBeenCalledWith(
       defaultProps.question,
       'Paris',
-      mockQuizContext.storyText
+      mockQuizContext.storyText,
+      mockQuizContext.userEmail,
+      mockQuizContext.storyId
     );
     await waitFor(() => {
-      expect(mockOnAnswered).toHaveBeenCalledWith(0, 5, 'Paris');
+      expect(mockOnAnswered).toHaveBeenCalledWith(
+        0,
+        5,
+        'Paris',
+        'Excellent! Votre réponse est parfaite.'
+      );
     });
     await waitFor(() => {
       const gradeText = screen.getByText('5/5');
@@ -105,5 +143,12 @@ describe('QuizQuestion', () => {
     fireEvent.change(input, { target: { value: '   ' } });
     fireEvent.click(submitButton);
     expect(mockValidateResponse).not.toHaveBeenCalled();
+  });
+
+  it('navigates back when back button is clicked', () => {
+    renderWithQuizContext(<QuizQuestion {...defaultProps} />);
+    const backButton = screen.getByText('Back');
+    fireEvent.click(backButton);
+    expect(mockFrenchIdolContext.setDisplayStoryUpload).toHaveBeenCalledWith(true);
   });
 });
