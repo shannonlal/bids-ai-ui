@@ -16,6 +16,7 @@ const mockFrenchIdolContext = {
   setDisplayStoryUpload: vi.fn(),
   setStoryText: vi.fn(),
   setInputMethod: vi.fn(),
+  resetForm: vi.fn(),
 };
 
 const renderWithContext = (ui: React.ReactElement) => {
@@ -32,18 +33,18 @@ describe('StoryInput', () => {
   it('renders textarea and submit button', () => {
     renderWithContext(<StoryInput />);
     expect(screen.getByPlaceholderText('Paste your story text here...')).toBeInTheDocument();
-    expect(screen.getByText('Start Practice')).toBeInTheDocument();
+    expect(screen.getByText('Create Story')).toBeInTheDocument();
   });
 
   it('shows error when submitting empty text', () => {
     renderWithContext(<StoryInput />);
-    fireEvent.click(screen.getByText('Start Practice'));
+    fireEvent.click(screen.getByText('Create Story'));
     expect(screen.getByText('Please enter some text')).toBeInTheDocument();
   });
 
   it('clears error when user starts typing', () => {
     renderWithContext(<StoryInput />);
-    fireEvent.click(screen.getByText('Start Practice'));
+    fireEvent.click(screen.getByText('Create Story'));
     expect(screen.getByText('Please enter some text')).toBeInTheDocument();
     const textarea = screen.getByPlaceholderText('Paste your story text here...');
     fireEvent.change(textarea, { target: { value: 'a' } });

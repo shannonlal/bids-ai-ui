@@ -22,7 +22,7 @@ interface StoryInputProps {
 }
 
 export const StoryInput = ({ onSuccess }: StoryInputProps) => {
-  const { setStoryText, setDisplayStoryUpload, setInputMethod, currentUser } = useFrenchIdol();
+  const { currentUser } = useFrenchIdol();
   const [isLoading, setIsLoading] = useState(false);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
@@ -68,9 +68,6 @@ export const StoryInput = ({ onSuccess }: StoryInputProps) => {
               }
 
               if (data.story) {
-                setStoryText(data.story.article);
-                setInputMethod('text');
-                setDisplayStoryUpload(false);
                 onSuccess?.();
               }
             } catch (e) {
@@ -81,7 +78,7 @@ export const StoryInput = ({ onSuccess }: StoryInputProps) => {
           }}
           disabled={isLoading}
         >
-          {isLoading ? 'Processing...' : 'Start Practice'}
+          {isLoading ? 'Processing...' : 'Create Story'}
         </Button>
       </div>
     </div>
