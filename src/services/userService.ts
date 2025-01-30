@@ -57,6 +57,38 @@ export class UserService {
 
     return !!user;
   }
+
+  /**
+   * Updates a user's profile information
+   * @param email - The email of the user to update
+   * @param updates - The fields to update (firstName and lastName)
+   * @returns The updated user data transformed to frontend type
+   * @throws Error if user is not found
+   */
+  async updateUser(
+    email: string,
+    updates: { firstName: string; lastName: string }
+  ): Promise<UserType> {
+    await connectDB();
+    const query = { email: email.toLowerCase() };
+    console.log('Updating user with query:', query);
+    console.log('Updates:', updates);
+
+    const user = await User.findOneAndUpdate(
+      query,
+      {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      throw new Error(`User not found with email: ${email}`);
+    }
+
+    return mapUserToDTO(user);
+  }
 }
 
 // Export a singleton instance

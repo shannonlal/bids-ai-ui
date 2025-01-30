@@ -25,3 +25,19 @@ export interface CreateUserInput {
 export interface GetUserResponse {
   user: User;
 }
+
+/**
+ * Type for updating a user's profile
+ */
+export interface UpdateUserInput {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+/**
+ * API response type for updating a user
+ */
+export interface UpdateUserResponse {
+  user: User;
+}
