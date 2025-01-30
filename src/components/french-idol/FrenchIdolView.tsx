@@ -11,7 +11,7 @@ export function FrenchIdolView() {
     useFrenchIdol();
 
   const handleStorySelect = (story: Story) => {
-    setStoryText(story.sourceText);
+    setStoryText(story.article);
     setDisplayStoryUpload(false);
   };
 
