@@ -6,7 +6,7 @@ const menuItems = [
   { label: 'Train', href: '/french-idol' },
   { label: 'Results', href: '#' },
   { label: 'Profile', href: '/profile' },
-  { label: 'Create Stories', href: '#' },
+  { label: 'Create Stories', href: '/french-idol/create' },
 ];
 
 export const Header: React.FC = () => {
