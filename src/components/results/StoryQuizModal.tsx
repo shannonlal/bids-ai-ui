@@ -45,6 +45,7 @@ export const StoryQuizModal: React.FC<StoryQuizModalProps> = ({ story, onClose, 
     response: story.questionResponses![index],
     correction: story.questionCorrections![index],
     score: story.quizScore! / story.totalQuestions!, // Approximate individual scores
+    suggestedAnswer: story.suggestedAnswers?.[index] || 'No suggested answer available',
   }));
 
   return (
