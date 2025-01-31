@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom'; // Add this to extend expect matchers
 import { QuizQuestion } from './QuizQuestion';
 import * as useValidResponseModule from '../../../hooks/useValidResponse';
 import { QuizContext } from './QuizContext';
@@ -19,8 +20,10 @@ const mockQuizContext = {
   questionScores: [],
   questionResponses: [],
   questionCorrections: [],
+  questionSuggestedAnswers: [],
   userEmail: 'test@example.com',
   storyId: 'story-123',
+  isCompleted: false,
   setCurrentQuestion: vi.fn(),
   setScore: vi.fn(),
   setStoryText: vi.fn(),
@@ -83,18 +86,19 @@ describe('QuizQuestion', () => {
 
   it('handles input changes', () => {
     renderWithQuizContext(<QuizQuestion {...defaultProps} />);
-    const input = screen.getByPlaceholderText('Enter your answer...');
+    const input = screen.getByPlaceholderText('Enter your answer...') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Paris' } });
-    expect(input).toHaveValue('Paris');
+    expect(input.value).toBe('Paris');
   });
 
   it('validates answer and shows result when submit button is clicked', async () => {
     mockValidateResponse.mockResolvedValueOnce({
       grade: 5,
       correction: 'Excellent! Votre réponse est parfaite.',
+      suggestedAnswer: 'La capitale de la France est Paris.',
     });
     renderWithQuizContext(<QuizQuestion {...defaultProps} />);
-    const input = screen.getByPlaceholderText('Enter your answer...');
+    const input = screen.getByPlaceholderText('Enter your answer...') as HTMLInputElement;
     const submitButton = screen.getByText('Submit');
 
     fireEvent.change(input, { target: { value: 'Paris' } });
@@ -112,13 +116,14 @@ describe('QuizQuestion', () => {
         0,
         5,
         'Paris',
-        'Excellent! Votre réponse est parfaite.'
+        'Excellent! Votre réponse est parfaite.',
+        'La capitale de la France est Paris.'
       );
     });
     await waitFor(() => {
       const gradeText = screen.getByText('5/5');
       expect(gradeText).toBeInTheDocument();
-      expect(input).toHaveValue('');
+      expect(input.value).toBe('');
     });
   });
 
