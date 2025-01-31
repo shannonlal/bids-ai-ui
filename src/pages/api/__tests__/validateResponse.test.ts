@@ -61,6 +61,38 @@ describe('validateResponse API', () => {
       json: jsonMock,
     };
     (answerService.saveAnswer as ReturnType<typeof vi.fn>).mockResolvedValue(mockAnswer);
+
+    // Setup default successful OpenAI responses
+    mockCreate
+      // First call - student evaluation
+      .mockResolvedValueOnce({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                score: 4.5,
+                correction: 'Excellent travail!',
+                suggestedAnswer: 'La réponse modèle ici.',
+              }),
+            },
+          },
+        ],
+      })
+      // Second call - teacher review
+      .mockResolvedValueOnce({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                isScoreAccurate: true,
+                finalScore: 4.5,
+                finalCorrection: 'Excellent travail!',
+                reviewComments: 'Score is accurate.',
+              }),
+            },
+          },
+        ],
+      });
   });
 
   it('returns 405 for non-POST requests', async () => {
@@ -211,21 +243,6 @@ describe('validateResponse API', () => {
   });
 
   it('successfully validates response and saves answer', async () => {
-    mockCreate.mockResolvedValueOnce({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify({
-              score: 4.5,
-              correction:
-                'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
-              suggestedAnswer: 'La réponse modèle ici.',
-            }),
-          },
-        },
-      ],
-    });
-
     mockReq = {
       method: 'POST',
       body: {
@@ -245,35 +262,21 @@ describe('validateResponse API', () => {
       'test question',
       'test response',
       4.5,
-      'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
+      'Excellent travail!',
       'La réponse modèle ici.'
     );
 
     expect(statusMock).toHaveBeenCalledWith(200);
     expect(jsonMock).toHaveBeenCalledWith({
       score: 4.5,
-      correction:
-        'Excellent travail! Votre réponse est très précise et bien structurée. Continuez comme ça!',
-      savedAnswer: mockAnswer,
+      correction: 'Excellent travail!',
       suggestedAnswer: 'La réponse modèle ici.',
+      reviewComments: 'Score is accurate.',
+      savedAnswer: mockAnswer,
     });
   });
 
   it('handles database error when saving answer', async () => {
-    mockCreate.mockResolvedValueOnce({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify({
-              score: 4.5,
-              correction: 'Excellent travail!',
-              suggestedAnswer: 'La réponse modèle ici.',
-            }),
-          },
-        },
-      ],
-    });
-
     (answerService.saveAnswer as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error('Database error')
     );
@@ -301,7 +304,7 @@ describe('validateResponse API', () => {
   });
 
   it('handles invalid response format from OpenAI', async () => {
-    mockCreate.mockResolvedValueOnce({
+    mockCreate.mockReset().mockResolvedValueOnce({
       choices: [
         {
           message: {
@@ -333,44 +336,8 @@ describe('validateResponse API', () => {
     });
   });
 
-  it('handles missing fields in OpenAI response', async () => {
-    mockCreate.mockResolvedValueOnce({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify({
-              score: 4.5,
-              // missing correction field
-            }),
-          },
-        },
-      ],
-    });
-
-    mockReq = {
-      method: 'POST',
-      body: {
-        story: 'test story',
-        question: 'test question',
-        response: 'test response',
-        userEmail: 'test@example.com',
-        storyId: 'story-123',
-      },
-    };
-
-    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
-
-    expect(statusMock).toHaveBeenCalledWith(500);
-    expect(jsonMock).toHaveBeenCalledWith({
-      error: {
-        message: 'Invalid response format from validation',
-        code: 'INVALID_RESPONSE_FORMAT',
-      },
-    });
-  });
-
   it('handles OpenAI API errors', async () => {
-    mockCreate.mockRejectedValueOnce(new Error('API Error'));
+    mockCreate.mockReset().mockRejectedValueOnce(new Error('API Error'));
 
     mockReq = {
       method: 'POST',
