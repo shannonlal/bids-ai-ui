@@ -17,6 +17,7 @@ export const QuizView: React.FC = () => {
     questionScores,
     questionResponses,
     questionCorrections,
+    questionSuggestedAnswers,
   } = useQuiz();
   const { setDisplayStoryUpload, isLoading, error } = useFrenchIdol();
 
@@ -65,6 +66,7 @@ export const QuizView: React.FC = () => {
                     score: questionScores[index] || 0,
                     response: questionResponses[index] || '',
                     correction: questionCorrections[index] || '',
+                    suggestedAnswer: questionSuggestedAnswers[index] || '',
                   }))}
                 />
                 <div className="text-center">

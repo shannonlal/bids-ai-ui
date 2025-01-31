@@ -1,38 +1,222 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
-import { ValidateResponseApiResponse } from '../../types/api/validateResponse';
+import {
+  ValidateResponseApiResponse,
+  ValidationInput,
+  StudentEvaluation,
+  TeacherReview,
+} from '../../types/api/validateResponse';
 import { answerService } from '../../services/answerService';
+import {
+  VALIDATE_RESPONSE_SYSTEM_PROMPT,
+  REVIEW_RESPONSE_SYSTEM_PROMPT,
+} from '../../constants/prompts';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-key';
-
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-const VALIDATE_RESPONSE_SYSTEM_PROMPT = `You are responsible for validating a response from a 10 year old student who is asking questions about the following article:
+interface ValidationResult {
+  isValid: boolean;
+  error?: {
+    message: string;
+    code: string;
+    status: number;
+  };
+  data?: ValidationInput;
+}
 
-{article}
+// const ERROR_CODES = {
+//   VALIDATION_FAILED: {
+//     status: 500,
+//     code: 'VALIDATION_FAILED',
+//   },
+//   PARSE_ERROR: {
+//     status: 500,
+//     code: 'PARSE_ERROR',
+//   },
+//   DATABASE_ERROR: {
+//     status: 500,
+//     code: 'DATABASE_ERROR',
+//   },
+//   OPENAI_ERROR: {
+//     status: 500,
+//     code: 'OPENAI_ERROR',
+//   },
+//   INVALID_RESPONSE_FORMAT: {
+//     status: 500,
+//     code: 'INVALID_RESPONSE_FORMAT',
+//   },
+// } as const;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const validateInputs = (body: any): ValidationResult => {
+  const { story, question, response, userEmail, storyId } = body;
 
-The student was asked the following question:
-{question}
+  if (!story || typeof story !== 'string') {
+    return {
+      isValid: false,
+      error: {
+        message: 'Story field is required and must be a string',
+        code: 'INVALID_INPUT',
+        status: 400,
+      },
+    };
+  }
 
-Please grade their response:
-{response}
+  if (!question || typeof question !== 'string') {
+    return {
+      isValid: false,
+      error: {
+        message: 'Question field is required and must be a string',
+        code: 'INVALID_INPUT',
+        status: 400,
+      },
+    };
+  }
 
-Grading criteria:
-1.5 points for accuracy
-1.5 points for writing a complete sentence
-2 points for grammar
+  if (!response || typeof response !== 'string') {
+    return {
+      isValid: false,
+      error: {
+        message: 'Response field is required and must be a string',
+        code: 'INVALID_INPUT',
+        status: 400,
+      },
+    };
+  }
 
-Here are key points for grammar:
-1. The sentences must have a period at the end
-2. Must start with a capital letter and have Capital letters for proper nouns
-3. Must have proper accented characters for French
+  if (!userEmail || typeof userEmail !== 'string') {
+    return {
+      isValid: false,
+      error: {
+        message: 'User email is required and must be a string',
+        code: 'INVALID_INPUT',
+        status: 400,
+      },
+    };
+  }
 
-Provide your response in the following JSON format:
-{
-  "score": (number between 0 and 5),
-  "correction": "(detailed explanation in French of the grade, including what was done well and what could be improved. Even for perfect scores, provide encouraging feedback.  No more than 30 words)",
-  "suggestedAnswer": "(write a model answer in French that would receive a perfect score. Keep it concise but complete.)"
-}`;
+  if (!storyId || typeof storyId !== 'string') {
+    return {
+      isValid: false,
+      error: {
+        message: 'Story ID is required and must be a string',
+        code: 'INVALID_INPUT',
+        status: 400,
+      },
+    };
+  }
+
+  return {
+    isValid: true,
+    data: { story, question, response, userEmail, storyId },
+  };
+};
+
+const evaluateStudentResponse = async (input: ValidationInput): Promise<StudentEvaluation> => {
+  const prompt = VALIDATE_RESPONSE_SYSTEM_PROMPT.replace('{article}', input.story)
+    .replace('{question}', input.question)
+    .replace('{response}', input.response);
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: prompt,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 250,
+    });
+
+    const aiResponse = completion.choices[0]?.message?.content;
+
+    if (!aiResponse) {
+      throw new Error('Failed to validate response');
+    }
+
+    const parsedResponse = JSON.parse(aiResponse);
+
+    if (
+      typeof parsedResponse.score !== 'number' ||
+      typeof parsedResponse.correction !== 'string' ||
+      typeof parsedResponse.suggestedAnswer !== 'string' ||
+      parsedResponse.score < 0 ||
+      parsedResponse.score > 5
+    ) {
+      throw new Error('Invalid response format from validation');
+    }
+
+    return {
+      score: parsedResponse.score,
+      correction: parsedResponse.correction,
+      suggestedAnswer: parsedResponse.suggestedAnswer,
+    };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('Failed to parse validation response');
+    }
+    throw error;
+  }
+};
+
+const evaluateTeacherResponse = async (
+  input: ValidationInput,
+  studentEvaluation: StudentEvaluation
+): Promise<TeacherReview> => {
+  const prompt = REVIEW_RESPONSE_SYSTEM_PROMPT.replace('{story}', input.story)
+    .replace('{question}', input.question)
+    .replace('{response}', input.response)
+    .replace('{score}', studentEvaluation.score.toString())
+    .replace('{correction}', studentEvaluation.correction)
+    .replace('{suggestedAnswer}', studentEvaluation.suggestedAnswer);
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: prompt,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 250,
+    });
+
+    const aiResponse = completion.choices[0]?.message?.content;
+
+    if (!aiResponse) {
+      throw new Error('Failed to review evaluation');
+    }
+
+    const parsedResponse = JSON.parse(aiResponse);
+
+    if (
+      typeof parsedResponse.isScoreAccurate !== 'boolean' ||
+      typeof parsedResponse.finalScore !== 'number' ||
+      typeof parsedResponse.finalCorrection !== 'string' ||
+      typeof parsedResponse.reviewComments !== 'string' ||
+      parsedResponse.finalScore < 0 ||
+      parsedResponse.finalScore > 5
+    ) {
+      throw new Error('Invalid response format from review');
+    }
+
+    return {
+      isScoreAccurate: parsedResponse.isScoreAccurate,
+      finalScore: parsedResponse.finalScore,
+      finalCorrection: parsedResponse.finalCorrection,
+      reviewComments: parsedResponse.reviewComments,
+    };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('Failed to parse review response');
+    }
+    throw error;
+  }
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -47,129 +231,54 @@ export default async function handler(
     });
   }
 
-  const { story, question, response, userEmail, storyId } = req.body;
-
-  if (!story || typeof story !== 'string') {
-    return res.status(400).json({
-      error: {
-        message: 'Story field is required and must be a string',
-        code: 'INVALID_INPUT',
-      },
-    });
-  }
-
-  if (!question || typeof question !== 'string') {
-    return res.status(400).json({
-      error: {
-        message: 'Question field is required and must be a string',
-        code: 'INVALID_INPUT',
-      },
-    });
-  }
-
-  if (!response || typeof response !== 'string') {
-    return res.status(400).json({
-      error: {
-        message: 'Response field is required and must be a string',
-        code: 'INVALID_INPUT',
-      },
-    });
-  }
-
-  if (!userEmail || typeof userEmail !== 'string') {
-    return res.status(400).json({
-      error: {
-        message: 'User email is required and must be a string',
-        code: 'INVALID_INPUT',
-      },
-    });
-  }
-
-  if (!storyId || typeof storyId !== 'string') {
-    return res.status(400).json({
-      error: {
-        message: 'Story ID is required and must be a string',
-        code: 'INVALID_INPUT',
-      },
+  // Validate inputs first
+  const validationResult = validateInputs(req.body);
+  if (!validationResult.isValid) {
+    const { status, message, code } = validationResult.error!;
+    return res.status(status).json({
+      error: { message, code },
     });
   }
 
   try {
-    const prompt = VALIDATE_RESPONSE_SYSTEM_PROMPT.replace('{article}', story)
-      .replace('{question}', question)
-      .replace('{response}', response);
+    // Get initial evaluation
+    const studentEvaluation = await evaluateStudentResponse(validationResult.data!);
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: prompt,
-        },
-      ],
-      temperature: 0.3,
-      max_tokens: 250, // Increased to accommodate the suggested answer
-    });
+    // Get teacher review
+    const teacherReview = await evaluateTeacherResponse(validationResult.data!, studentEvaluation);
 
-    const aiResponse = completion.choices[0]?.message?.content;
+    // Save final results
+    try {
+      const savedAnswer = await answerService.saveAnswer(
+        validationResult.data!.userEmail,
+        validationResult.data!.storyId,
+        validationResult.data!.question,
+        validationResult.data!.response,
+        teacherReview.finalScore,
+        teacherReview.finalCorrection,
+        studentEvaluation.suggestedAnswer
+      );
 
-    if (!aiResponse) {
+      return res.status(200).json({
+        score: teacherReview.finalScore,
+        correction: teacherReview.finalCorrection,
+        suggestedAnswer: studentEvaluation.suggestedAnswer,
+        reviewComments: teacherReview.reviewComments,
+        savedAnswer,
+      });
+    } catch (dbError) {
       return res.status(500).json({
         error: {
-          message: 'Failed to validate response',
-          code: 'VALIDATION_FAILED',
+          message: 'Failed to save answer to database',
+          code: 'DATABASE_ERROR',
         },
       });
     }
+  } catch (error) {
+    console.error('Error in validate response:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
 
-    try {
-      console.log('Parsing response:', aiResponse);
-      const parsedResponse = JSON.parse(aiResponse);
-
-      if (
-        typeof parsedResponse.score !== 'number' ||
-        typeof parsedResponse.correction !== 'string' ||
-        typeof parsedResponse.suggestedAnswer !== 'string' ||
-        parsedResponse.score < 0 ||
-        parsedResponse.score > 5
-      ) {
-        return res.status(500).json({
-          error: {
-            message: 'Invalid response format from validation',
-            code: 'INVALID_RESPONSE_FORMAT',
-          },
-        });
-      }
-
-      // Save the answer using answerService
-      try {
-        const savedAnswer = await answerService.saveAnswer(
-          userEmail,
-          storyId,
-          question,
-          response,
-          parsedResponse.score,
-          parsedResponse.correction,
-          parsedResponse.suggestedAnswer
-        );
-
-        return res.status(200).json({
-          score: parsedResponse.score,
-          correction: parsedResponse.correction,
-          suggestedAnswer: parsedResponse.suggestedAnswer,
-          savedAnswer,
-        });
-      } catch (dbError) {
-        console.error('Database error:', dbError);
-        return res.status(500).json({
-          error: {
-            message: 'Failed to save answer to database',
-            code: 'DATABASE_ERROR',
-          },
-        });
-      }
-    } catch (parseError) {
-      console.error('Parse error:', parseError);
+    if (errorMessage.includes('Failed to parse')) {
       return res.status(500).json({
         error: {
           message: 'Failed to parse validation response',
@@ -177,8 +286,16 @@ export default async function handler(
         },
       });
     }
-  } catch (error) {
-    console.error('Error validating response:', error);
+
+    if (errorMessage.includes('Invalid response format')) {
+      return res.status(500).json({
+        error: {
+          message: 'Invalid response format from validation',
+          code: 'INVALID_RESPONSE_FORMAT',
+        },
+      });
+    }
+
     return res.status(500).json({
       error: {
         message: 'Failed to validate response',

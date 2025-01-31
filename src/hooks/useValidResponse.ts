@@ -4,6 +4,7 @@ import { ValidateResponseApiResponse } from '../types/api/validateResponse';
 export interface ValidationResult {
   grade: number;
   correction?: string;
+  suggestedAnswer?: string;
   errorMessage?: string;
   savedAnswer?: {
     id: string;
@@ -52,8 +53,9 @@ export const useValidResponse = () => {
         }
 
         return {
-          grade: data.score,
+          grade: data.score || 0,
           correction: data.correction,
+          suggestedAnswer: data.suggestedAnswer,
           savedAnswer: data.savedAnswer,
         };
       } catch (error) {

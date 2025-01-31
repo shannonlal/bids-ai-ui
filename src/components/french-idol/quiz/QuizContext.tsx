@@ -10,6 +10,7 @@ interface QuizContextType {
   questionScores: number[];
   questionResponses: string[];
   questionCorrections: string[];
+  questionSuggestedAnswers: string[];
   userEmail: string;
   storyId: string;
   isCompleted: boolean;
@@ -23,7 +24,8 @@ interface QuizContextType {
     questionIndex: number,
     grade: number,
     response: string,
-    correction: string
+    correction: string,
+    suggestedAnswer: string
   ) => void;
   hasMoreQuestions: () => boolean;
   resetQuiz: () => void;
@@ -52,6 +54,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
   const [questionScores, setQuestionScores] = useState<number[]>([]);
   const [questionResponses, setQuestionResponses] = useState<string[]>([]);
   const [questionCorrections, setQuestionCorrections] = useState<string[]>([]);
+  const [questionSuggestedAnswers, setQuestionSuggestedAnswers] = useState<string[]>([]);
   const [userEmail, setUserEmail] = useState(initialUserEmail);
   const [storyId, setStoryId] = useState(initialStoryId);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -64,6 +67,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
     setQuestionScores([]);
     setQuestionResponses([]);
     setQuestionCorrections([]);
+    setQuestionSuggestedAnswers([]);
     setIsCompleted(false);
   };
 
@@ -113,7 +117,8 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
     questionIndex: number,
     grade: number,
     response: string,
-    correction: string
+    correction: string,
+    suggestedAnswer: string
   ) => {
     setAnsweredQuestions(prev => {
       if (prev.includes(questionIndex)) {
@@ -136,6 +141,11 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
       const newCorrections = [...prev];
       newCorrections[questionIndex] = correction;
       return newCorrections;
+    });
+    setQuestionSuggestedAnswers(prev => {
+      const newSuggestedAnswers = [...prev];
+      newSuggestedAnswers[questionIndex] = suggestedAnswer;
+      return newSuggestedAnswers;
     });
 
     // Check if this was the last question
@@ -164,6 +174,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({
     questionScores,
     questionResponses,
     questionCorrections,
+    questionSuggestedAnswers,
     userEmail,
     storyId,
     isCompleted,

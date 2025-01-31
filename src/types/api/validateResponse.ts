@@ -1,4 +1,4 @@
-export interface ValidateResponseRequest {
+export interface ValidationInput {
   story: string;
   question: string;
   response: string;
@@ -6,31 +6,28 @@ export interface ValidateResponseRequest {
   storyId: string;
 }
 
-export interface ValidateResponseSuccess {
+export interface StudentEvaluation {
   score: number;
   correction: string;
   suggestedAnswer: string;
-  savedAnswer: {
-    id: string;
-    userEmail: string;
-    storyId: string;
-    question: string;
-    answer: string;
-    score: number;
-    correction: string;
-    suggestedAnswer: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  error?: never;
 }
 
-export interface ValidateResponseError {
-  score?: never;
-  error: {
+export interface TeacherReview {
+  isScoreAccurate: boolean;
+  finalScore: number;
+  finalCorrection: string;
+  reviewComments: string;
+}
+
+export interface ValidateResponseApiResponse {
+  score?: number;
+  correction?: string;
+  suggestedAnswer?: string;
+  reviewComments?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  savedAnswer?: any;
+  error?: {
     message: string;
     code: string;
   };
 }
-
-export type ValidateResponseApiResponse = ValidateResponseSuccess | ValidateResponseError;

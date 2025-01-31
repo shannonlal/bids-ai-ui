@@ -5,6 +5,7 @@ interface QuizResult {
   score: number;
   response: string;
   correction: string;
+  suggestedAnswer: string;
 }
 
 interface QuizResultsProps {
@@ -34,6 +35,9 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ results }) => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Feedback
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Suggested Answer
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -51,6 +55,9 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ results }) => {
                 <td className="px-6 py-4 whitespace-normal text-sm text-gray-900 italic">
                   {result.correction}
                 </td>
+                <td className="px-6 py-4 whitespace-normal text-sm text-green-600">
+                  {result.suggestedAnswer}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -59,7 +66,7 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ results }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 Total Score
               </td>
-              <td colSpan={2}></td>
+              <td colSpan={3}></td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {totalScore}/{maxPossibleScore}
               </td>

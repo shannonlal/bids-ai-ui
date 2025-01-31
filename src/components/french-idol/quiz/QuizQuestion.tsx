@@ -8,7 +8,13 @@ import { useFrenchIdol } from '../FrenchIdolContext';
 interface QuizQuestionProps {
   question: string;
   questionIndex: number;
-  onAnswered: (index: number, grade: number, response: string, correction: string) => void;
+  onAnswered: (
+    index: number,
+    grade: number,
+    response: string,
+    correction: string,
+    suggestedAnswer: string
+  ) => void;
 }
 
 export const QuizQuestion: React.FC<QuizQuestionProps> = ({
@@ -46,7 +52,13 @@ export const QuizQuestion: React.FC<QuizQuestionProps> = ({
 
       const questionGrade = result.grade || 0;
       setGrade(questionGrade);
-      onAnswered(questionIndex, questionGrade, answer, result.correction || '');
+      onAnswered(
+        questionIndex,
+        questionGrade,
+        answer,
+        result.correction || '',
+        result.suggestedAnswer || ''
+      );
       setAnswer('');
     } catch (err) {
       setError(
