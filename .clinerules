@@ -1,0 +1,56 @@
+# Project Guidelines
+
+## Configuration File Protection
+
+### File Modification Restrictions
+
+- **Scope:** `package.json`, `tsconfig.json`, `vitest.config.json`, `next.config.js`, `postcss.config.js`, `.env`
+- **Rule:** DO NOT write to or modify these configuration files without explicit user approval.
+- **Action:** Before attempting to modify any of these files, use `<ask_followup_question>` to confirm with the user if the modification is allowed.
+
+## Git Branching for New Tasks
+
+### Branch Creation Workflow
+
+- **Trigger:** When a new task is initiated.
+- **Action:** Use `<ask_followup_question>` to ask the user: "Should I create a new Git branch for this task?"
+  - If user approves: Proceed to create a new branch using `<execute_command>` with `git checkout -b <branch_name>`. You should suggest a branch name based on the task.
+  - If user denies: Continue in the current branch.
+
+## Automated Git Commits for Major Features
+
+### Commit Workflow
+
+- **Trigger:** After completing a major feature or a significant set of changes.
+- **Action:** Use `<ask_followup_question>` to ask the user: "Should I commit the current changes?"
+  - If user approves:
+    1.  Use `<execute_command>` with `git add .` to stage all changed files.
+    2.  Use `<execute_command>` to generate a concise and informative commit message (e.g., using `git diff --cached | ai-commit-message-generator`). If you cannot generate a commit message, ask the user to provide one.
+    3.  Use `<execute_command>` with `git commit -m "<generated_commit_message>"` to commit the changes.
+    - After each step, confirm success with the user.
+  - If user denies: Do not commit changes and proceed without committing.
+
+## Active Development Feedback (Linting and Testing)
+
+### Real-time Feedback during Development
+
+- **Linting (Watch Mode):**
+  - **Action:** When starting active code development in Code mode, use `<execute_command>` to open a new terminal and run `npm run lint:watch` (or the appropriate linting command for the project).
+  - **Focus:** Ensure the terminal running `lint:watch` is focused so the user can immediately see linting errors.
+- **Testing (Watch Mode):**
+  - **Action:** In a separate terminal, use `<execute_command>` to open another new terminal and run `npm run test:watch` (or the appropriate test command for the project).
+  - **Focus:** Keep focus on the linting errors terminal, but ensure the user is aware of the running tests in the background.
+- **Error Detection and User Interaction:**
+  - **Condition:** If new linting or test errors are introduced as a result of code changes.
+  - **Action:** Use `<ask_followup_question>` to ask the user: "New linting/testing errors have been introduced. Should I attempt to fix them?"
+    - If user approves: Proceed to attempt to fix the errors in Code mode.
+    - If user denies: Continue without fixing the errors but inform the user about the errors and potential consequences.
+
+**Important Considerations:**
+
+- **User Approval:** For all actions involving file modifications, Git operations, or potentially disruptive actions, always use `<ask_followup_question>` to get explicit user approval before proceeding.
+- **Error Handling:** Implement robust error handling for all tool executions, especially for terminal commands and Git operations. Inform the user clearly if any command fails.
+- **Clarity in Communication:** When asking follow-up questions, clearly state the reason for the question and the implications of different responses.
+- **Adapt Commands:** Ensure that the commands used (e.g., `npm run lint:watch`, `git add .`, `git commit`) are appropriate for the user's project and operating system. You may need to adjust these commands based on the project's `package.json` or other configuration files.
+
+This `.clinerules` file provides a comprehensive set of guidelines for Roo Code to follow, balancing automation with user control and incorporating best practices for code quality, version control, and project management. Remember that this is a starting point and can be further refined based on specific project needs and user feedback.
