@@ -72,10 +72,17 @@
    - Performance metrics
 
 3. User Experience 🔄
+
    - Workflow optimization
    - Navigation improvements
    - Feedback mechanisms
    - Error handling
+
+4. Effort Diary System 🔄
+   - Database schema design
+   - API layer implementation
+   - UI components development
+   - Integration with user system
 
 ## Pending Features
 
@@ -87,6 +94,7 @@
    - Learning metrics
    - Performance analysis
    - Usage statistics
+   - Effort tracking analytics
 
 2. Content Management 📋
 
@@ -157,6 +165,7 @@
    - Quiz system optimization
    - User experience improvement
    - Analytics implementation
+   - Effort diary implementation
 
 3. Technical Improvement
    - Code organization
@@ -178,6 +187,7 @@
    - Advanced analytics
    - Content management tools
    - User collaboration features
+   - Effort tracking enhancements
 
 Legend:
 
