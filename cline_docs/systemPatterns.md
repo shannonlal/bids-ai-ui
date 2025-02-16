@@ -41,10 +41,17 @@
    - Test file co-location with implementation
 
 3. State Management
+
    - React Context for feature-specific state
    - Custom hooks for shared logic (useDetermineQuestions, usePdfParser)
    - Service layer for API interactions (storyService, userService)
    - MongoDB models for data persistence
+
+4. GitHub Integration Pattern
+   - MCP server for GitHub operations
+   - CLI-first approach for Git commands
+   - Programmatic PR management
+   - Template-driven workflows
 
 ## Key Technical Patterns
 
@@ -83,6 +90,18 @@ graph TD
     E --> F[Progress Update]
 ```
 
+### GitHub Integration Flow
+
+```mermaid
+graph TD
+    A[Git Operation] --> B[CLI Command]
+    B --> C[Local Git]
+    C --> D[GitHub MCP Server]
+    D --> E[GitHub API]
+    E --> F[PR/Branch Update]
+    F --> G[Operation Result]
+```
+
 ## Component Relationships
 
 ### UI Components
@@ -112,9 +131,16 @@ graph TD
    - answerService (quiz responses)
 
 2. API Integration
+
    - MongoDB connection (lib/mongodb.ts)
    - API routes for core functionality
    - Type-safe API responses
+
+3. GitHub Integration Services
+   - GitHub MCP server
+   - PR management tools
+   - Git operation handlers
+   - Template processors
 
 ## Code Organization
 
@@ -143,9 +169,16 @@ graph TD
    - Response validation
 
 2. State Management Flow
+
    - Context providers for feature state
    - Custom hooks for business logic
    - Service layer for data operations
    - Model layer for data structure
 
-This system patterns documentation serves as a guide for maintaining consistency and understanding the technical architecture of the Bids AI platform.
+3. GitHub Operation Flow
+   - CLI command execution
+   - MCP server interaction
+   - Template processing
+   - Response handling
+
+This system patterns documentation serves as a guide for maintaining consistency and understanding the technical architecture of the Bids AI platform, including the MCP-based GitHub integration approach.
