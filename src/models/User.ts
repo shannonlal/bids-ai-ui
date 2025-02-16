@@ -7,6 +7,7 @@ import { User as UserType } from '../types/user';
 export interface IUserDocument extends Document {
   _id: mongoose.Types.ObjectId;
   email: string;
+  password: string;
   firstName: string;
   lastName: string;
   createdAt: string; // Changed to string to match DB
@@ -24,6 +25,10 @@ const userSchema = new Schema<IUserDocument>(
       unique: true,
       trim: true,
       lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
     },
     firstName: {
       type: String,

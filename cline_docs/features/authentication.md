@@ -29,7 +29,11 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    async (email, password, done) => {
+    async (
+      email: string,
+      password: string,
+      done: (error: any, user?: any, options?: { message: string }) => void
+    ) => {
       try {
         const user = await User.findOne({ email });
 
@@ -51,18 +55,23 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => {
-  done(null, user._id);
+passport.serializeUser((user: IUserDocument, done: (err: any, id?: string) => void) => {
+  done(null, user._id.toString()); // Convert ObjectId to string
 });
 
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error);
+passport.deserializeUser(
+  async (id: string, done: (err: any, user?: IUserDocument | false) => void) => {
+    try {
+      const user = await User.findById(id);
+      if (!user) {
+        return done(new Error('User not found'));
+      }
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
   }
-});
+);
 
 export default passport;
 ```
@@ -257,6 +266,44 @@ Add these variables to your `.env` file:
 ```
 SESSION_SECRET=your-secure-session-secret
 MONGODB_URI=your-mongodb-connection-string
+```
+
+### TypeScript Best Practices
+
+#### Type Safety in Authentication
+
+1. **Callback Types**
+
+   - Use specific types for Passport.js callbacks instead of the generic `Function` type
+   - Define return types for all async functions
+   - Properly type error and success cases
+
+2. **User Types**
+
+   - Use `IUserDocument` interface extending MongoDB's `Document` type
+   - Avoid using `any` type for user objects
+   - Convert MongoDB ObjectId to string when serializing
+
+3. **Error Handling**
+   - Type error cases explicitly
+   - Include proper error messages in return types
+   - Handle null/undefined cases with proper type guards
+
+Example of proper typing:
+
+```typescript
+// User document interface
+interface IUserDocument extends Document {
+  _id: mongoose.Types.ObjectId;
+  email: string;
+  password: string;
+  // ... other fields
+}
+
+// Passport callback types
+type DoneCallback = (error: any, user?: any, options?: { message: string }) => void;
+type SerializeCallback = (err: any, id?: string) => void;
+type DeserializeCallback = (err: any, user?: IUserDocument | false) => void;
 ```
 
 ### Implementation Steps
