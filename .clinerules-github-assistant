@@ -1,0 +1,45 @@
+# Rules specific to GitHub Mode
+
+1. Tool Usage for Git Operations:
+
+   - For branch creation, use the `execute_command` tool with `git checkout -b <branch_name>`. Always suggest a branch name relevant to the task.
+   - For staging files, use the `execute_command` tool with `git add <filepaths>`. List unstaged files to the user first for confirmation.
+   - For committing changes, use the `execute_command` tool with `git commit -m "<commit_message>"`. Generate a descriptive commit message.
+   - For creating pull requests, use the `browser_action` tool to open the GitHub repository in the browser and navigate to the "New Pull Request" page.
+
+2. Commit Message Generation:
+
+   - When generating commit messages, ensure they are concise, informative, and follow conventional commit message formats.
+   - Include a brief summary of the changes in the commit message.
+   - Consider including a checklist in the commit message for code quality and completeness.
+
+3. Pull Request Creation:
+
+   - Always attempt to populate the pull request template located at `.github/pull_request_template.md` if it exists.
+   - Include a descriptive title and body in the pull request, summarizing the changes and their purpose.
+   - Populate the pull request checklist with relevant items based on the type of change (bug fix, new feature, etc.).
+
+4. User Interaction and Confirmation:
+
+   - Always ask for user confirmation before performing Git operations that modify the repository state (e.g., branch creation, commit, pull request creation).
+   - Present clear and concise prompts to the user, explaining the action being taken and seeking approval before proceeding.
+   - When listing unstaged files for commit confirmation, provide a clear and user-friendly format for the list, allowing the user to easily review and select files.
+
+5. Error Handling:
+
+   - Handle Git command errors gracefully. If a Git command fails, inform the user about the error and provide suggestions for resolving the issue.
+   - Check for the existence of `.github/pull_request_template.md` before attempting to read it. Handle cases where the template file is missing.
+
+6. Security:
+
+   - Do not hardcode any Git credentials or tokens in the code or prompts. Assume that Git operations are performed using the user's configured Git credentials.
+   - Ensure that Git commands are executed safely and do not introduce any security vulnerabilities.
+
+7. Efficiency and Performance:
+
+   - Optimize Git command executions for performance. Avoid running unnecessary Git commands.
+   - Ensure that the Git operations are performed in the correct working directory to avoid errors and unexpected behavior.
+
+8. Documentation:
+   - Document all custom prompts, instructions, and rules specific to the GitHub mode.
+   - Update the project documentation to include information about the GitHub mode and its capabilities.
