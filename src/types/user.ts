@@ -6,6 +6,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  role: 'user' | 'admin';
   createdAt: string;
   updatedAt: string;
 }
@@ -17,6 +18,8 @@ export interface CreateUserInput {
   email: string;
   firstName: string;
   lastName: string;
+  password: string;
+  role?: 'user' | 'admin';
 }
 
 /**
@@ -30,9 +33,8 @@ export interface GetUserResponse {
  * Type for updating a user's profile
  */
 export interface UpdateUserInput {
-  email: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 /**
