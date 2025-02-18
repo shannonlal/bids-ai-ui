@@ -1,0 +1,61 @@
+# Rules specific to GitHub Mode
+
+1. Tool Usage for Git Operations:
+
+   - For branch creation, use the `execute_command` tool with `git checkout -b <branch_name>`. Always suggest a branch name relevant to the task.
+   - For staging files, use the `execute_command` tool with `git add <filepaths>`. List unstaged files to the user first for confirmation.
+   - For committing changes, use the `execute_command` tool with `git commit -m "<commit_message>"`. Generate a descriptive commit message.
+   - For creating pull requests, use the GitHub MCP server's `create_pull_request` tool. This replaces the previous browser-based approach.
+
+2. MCP Server Usage:
+
+   - Always use the GitHub MCP server tools for operations that interact with GitHub's API.
+   - Use the appropriate MCP tool for each GitHub operation:
+     - `create_pull_request` for new PRs
+     - `list_pull_requests` for viewing PRs
+     - `update_pull_request` for modifying PRs
+   - Access PR templates and branch information through MCP resources:
+     - `github://templates/pull_request` for PR templates
+     - `github://branches/{branch_name}` for branch info
+
+3. Commit Message Generation:
+
+   - When generating commit messages, ensure they are concise, informative, and follow conventional commit message formats.
+   - Include a brief summary of the changes in the commit message.
+   - Consider including a checklist in the commit message for code quality and completeness.
+
+4. Pull Request Creation:
+
+   - Use the GitHub MCP server to fetch and populate the PR template.
+   - Include a descriptive title and body in the pull request, summarizing the changes and their purpose.
+   - Populate the pull request checklist with relevant items based on the type of change (bug fix, new feature, etc.).
+
+5. User Interaction and Confirmation:
+
+   - Always ask for user confirmation before performing Git operations that modify the repository state (e.g., branch creation, commit, pull request creation).
+   - Present clear and concise prompts to the user, explaining the action being taken and seeking approval before proceeding.
+   - When listing unstaged files for commit confirmation, provide a clear and user-friendly format for the list, allowing the user to easily review and select files.
+
+6. Error Handling:
+
+   - Handle Git command errors gracefully. If a Git command fails, inform the user about the error and provide suggestions for resolving the issue.
+   - Handle MCP tool errors appropriately, providing clear feedback about API-related issues.
+   - Check for MCP server availability before attempting to use GitHub tools.
+
+7. Security:
+
+   - Do not hardcode any Git credentials or tokens in the code or prompts.
+   - Ensure all GitHub API interactions are handled through the MCP server's secure token management.
+   - Verify that sensitive information is not exposed in commit messages or PR descriptions.
+
+8. Efficiency and Performance:
+
+   - Optimize Git command executions for performance. Avoid running unnecessary Git commands.
+   - Use MCP resources efficiently by caching responses when appropriate.
+   - Ensure that Git operations are performed in the correct working directory to avoid errors and unexpected behavior.
+
+9. Documentation:
+
+   - Document all custom prompts, instructions, and rules specific to the GitHub mode.
+   - Update the project documentation to include information about the GitHub mode and its capabilities.
+   - Maintain documentation about the GitHub MCP server configuration and usage in cline_docs/features/github-integration.md.
