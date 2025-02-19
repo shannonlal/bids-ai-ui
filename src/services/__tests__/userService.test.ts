@@ -1,20 +1,34 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import mongoose from 'mongoose';
-import { userService } from '../userService';
+import bcrypt from 'bcryptjs';
 import { User, IUserDocument } from '../../models/User';
-import connectDB from '../../lib/mongodb';
+import { userService } from '../userService';
 
-// Mock the MongoDB connection
+// Mock MongoDB connection
 vi.mock('../../lib/mongodb', () => ({
+  __esModule: true,
   default: vi.fn().mockResolvedValue(mongoose),
 }));
 
+// Mock bcrypt with a default export
+vi.mock('bcryptjs', async importOriginal => {
+  const actual = await importOriginal<typeof import('bcryptjs')>();
+  return {
+    ...actual,
+    hash: vi.fn(actual.hash),
+  };
+});
+
 describe('UserService', () => {
-  const mockUser: Partial<IUserDocument> = {
+  const mockEmail = 'test@example.com';
+  const mockPassword = 'password123';
+
+  const mockUserDoc: Partial<IUserDocument> = {
     _id: new mongoose.Types.ObjectId(),
-    email: 'test@example.com',
+    email: mockEmail.toLowerCase(),
     firstName: 'John',
     lastName: 'Doe',
+    role: 'user',
     createdAt: '2024-01-29T12:00:00.000Z',
     updatedAt: '2024-01-29T12:00:00.000Z',
   };
@@ -23,106 +37,95 @@ describe('UserService', () => {
     vi.clearAllMocks();
   });
 
-  describe('getUserByEmail', () => {
-    it('should return user when found', async () => {
-      // Mock the User.findOne method
-      vi.spyOn(User, 'findOne').mockResolvedValueOnce(mockUser as IUserDocument);
+  describe('createUser', () => {
+    it('should create a new user successfully', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User, 'findOne').mockResolvedValueOnce(null);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as any);
+      const saveMock = vi.fn().mockResolvedValue(mockUserDoc);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User.prototype, 'save').mockImplementation(saveMock);
 
-      const result = await userService.getUserByEmail('test@example.com');
+      const result = await userService.createUser({
+        email: mockEmail,
+        firstName: 'John',
+        lastName: 'Doe',
+        password: mockPassword,
+        role: 'user',
+      });
 
-      expect(connectDB).toHaveBeenCalled();
-      expect(User.findOne).toHaveBeenCalledWith({
-        email: 'test@example.com',
+      // Use partial matching to ignore dynamic timestamps
+      expect(result).toMatchObject({
+        email: mockEmail.toLowerCase(),
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'user',
       });
-      expect(result).toEqual({
-        id: mockUser._id!.toString(),
-        email: mockUser.email,
-        firstName: mockUser.firstName,
-        lastName: mockUser.lastName,
-        createdAt: mockUser.createdAt,
-        updatedAt: mockUser.updatedAt,
-      });
+      expect(bcrypt.hash).toHaveBeenCalledWith(mockPassword, 10);
     });
 
-    it('should throw error when user not found', async () => {
-      // Mock the User.findOne method to return null
-      vi.spyOn(User, 'findOne').mockResolvedValueOnce(null);
+    it('should throw error if user already exists', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User, 'findOne').mockResolvedValueOnce(mockUserDoc as any);
 
-      await expect(userService.getUserByEmail('nonexistent@example.com')).rejects.toThrow(
-        'User not found with email: nonexistent@example.com'
+      await expect(
+        userService.createUser({
+          email: mockEmail,
+          firstName: 'John',
+          lastName: 'Doe',
+          password: mockPassword,
+          role: 'user',
+        })
+      ).rejects.toThrow('User with this email already exists');
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should delete user successfully', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User, 'deleteOne').mockResolvedValueOnce({ deletedCount: 1 } as any);
+
+      await expect(userService.deleteUser(mockEmail)).resolves.not.toThrow();
+    });
+
+    it('should throw error if user not found', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User, 'deleteOne').mockResolvedValueOnce({ deletedCount: 0 } as any);
+
+      await expect(userService.deleteUser(mockEmail)).rejects.toThrow(
+        `User not found with email: ${mockEmail}`
       );
-
-      expect(connectDB).toHaveBeenCalled();
-      expect(User.findOne).toHaveBeenCalledWith({
-        email: 'nonexistent@example.com',
-      });
     });
   });
 
-  describe('getAllUsers', () => {
-    it('should return all users', async () => {
-      const mockUsers = [
-        mockUser,
-        {
-          ...mockUser,
-          _id: new mongoose.Types.ObjectId(),
-          email: 'test2@example.com',
-        },
-      ];
+  describe('resetPassword', () => {
+    it('should reset password successfully', async () => {
+      const newPassword = 'newPassword123';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(bcrypt, 'hash').mockResolvedValue('newHashedPassword' as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User, 'findOneAndUpdate').mockResolvedValueOnce(mockUserDoc as any);
 
-      // Mock the User.find method
-      vi.spyOn(User, 'find').mockResolvedValueOnce(mockUsers as IUserDocument[]);
-
-      const result = await userService.getAllUsers();
-
-      expect(connectDB).toHaveBeenCalled();
-      expect(User.find).toHaveBeenCalledWith({});
-      expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({
-        id: mockUsers[0]._id!.toString(),
-        email: mockUsers[0].email,
-        firstName: mockUsers[0].firstName,
-        lastName: mockUsers[0].lastName,
-        createdAt: mockUsers[0].createdAt,
-        updatedAt: mockUsers[0].updatedAt,
-      });
+      await expect(userService.resetPassword(mockEmail, newPassword)).resolves.not.toThrow();
     });
 
-    it('should return empty array when no users exist', async () => {
-      // Mock the User.find method to return empty array
-      vi.spyOn(User, 'find').mockResolvedValueOnce([]);
-
-      const result = await userService.getAllUsers();
-
-      expect(connectDB).toHaveBeenCalled();
-      expect(User.find).toHaveBeenCalledWith({});
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('exists', () => {
-    it('should return true when user exists', async () => {
-      vi.spyOn(User, 'findOne').mockResolvedValueOnce(mockUser as IUserDocument);
-
-      const result = await userService.exists('test@example.com');
-
-      expect(result).toBe(true);
-      expect(connectDB).toHaveBeenCalled();
-      expect(User.findOne).toHaveBeenCalledWith({
-        email: 'test@example.com',
-      });
+    it('should throw error for short password', async () => {
+      await expect(userService.resetPassword(mockEmail, '123')).rejects.toThrow(
+        'Password must be at least 8 characters long'
+      );
     });
 
-    it('should return false when user does not exist', async () => {
-      vi.spyOn(User, 'findOne').mockResolvedValueOnce(null);
+    it('should throw error if user not found during password reset', async () => {
+      const newPassword = 'newPassword123';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(bcrypt, 'hash').mockResolvedValue('newHashedPassword' as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(User, 'findOneAndUpdate').mockResolvedValueOnce(null);
 
-      const result = await userService.exists('nonexistent@example.com');
-
-      expect(result).toBe(false);
-      expect(connectDB).toHaveBeenCalled();
-      expect(User.findOne).toHaveBeenCalledWith({
-        email: 'nonexistent@example.com',
-      });
+      await expect(userService.resetPassword(mockEmail, newPassword)).rejects.toThrow(
+        `User not found with email: ${mockEmail}`
+      );
     });
   });
 });

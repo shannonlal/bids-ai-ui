@@ -1,6 +1,7 @@
 import { User, mapUserToDTO } from '../models/User';
 import connectDB from '../lib/mongodb';
-import { User as UserType } from '../types/user';
+import { User as UserType, CreateUserInput, UpdateUserInput } from '../types/user';
+import bcrypt from 'bcryptjs';
 
 /**
  * Service class for handling user-related operations
@@ -43,19 +44,36 @@ export class UserService {
   }
 
   /**
-   * Checks if a user exists with the given email
-   * @param email - The email address to check
-   * @returns True if user exists, false otherwise
+   * Create a new user
+   * @param userData - User creation input data
+   * @returns Created user data
    */
-  async exists(email: string): Promise<boolean> {
+  async createUser(userData: CreateUserInput): Promise<UserType> {
     await connectDB();
-    const query = { email: email.toLowerCase() };
-    console.log('Checking user existence with query:', query);
 
-    const user = await User.findOne(query);
-    console.log('Raw existence check result:', user);
+    // Check for existing user
+    const existingUser = await User.findOne({
+      email: userData.email.toLowerCase(),
+    });
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
 
-    return !!user;
+    // Hash password
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+    const newUser = new User({
+      email: userData.email.toLowerCase(),
+      password: hashedPassword,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      role: userData.role || 'user',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    await newUser.save();
+    return mapUserToDTO(newUser);
   }
 
   /**
@@ -65,10 +83,7 @@ export class UserService {
    * @returns The updated user data transformed to frontend type
    * @throws Error if user is not found
    */
-  async updateUser(
-    email: string,
-    updates: { firstName: string; lastName: string }
-  ): Promise<UserType> {
+  async updateUser(email: string, updates: UpdateUserInput): Promise<UserType> {
     await connectDB();
     const query = { email: email.toLowerCase() };
     console.log('Updating user with query:', query);
@@ -88,6 +103,65 @@ export class UserService {
     }
 
     return mapUserToDTO(user);
+  }
+
+  /**
+   * Deletes a user by email
+   * @param email - User's email
+   */
+  async deleteUser(email: string): Promise<void> {
+    await connectDB();
+    const result = await User.deleteOne({
+      email: email.toLowerCase(),
+    });
+
+    if (result.deletedCount === 0) {
+      throw new Error(`User not found with email: ${email}`);
+    }
+  }
+
+  /**
+   * Resets a user's password
+   * @param email - User's email
+   * @param newPassword - New password
+   */
+  async resetPassword(email: string, newPassword: string): Promise<void> {
+    await connectDB();
+
+    // Password complexity check
+    if (newPassword.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const user = await User.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      {
+        password: hashedPassword,
+        updatedAt: new Date().toISOString(),
+      }
+    );
+
+    if (!user) {
+      throw new Error(`User not found with email: ${email}`);
+    }
+  }
+
+  /**
+   * Checks if a user exists with the given email
+   * @param email - The email address to check
+   * @returns True if user exists, false otherwise
+   */
+  async exists(email: string): Promise<boolean> {
+    await connectDB();
+    const query = { email: email.toLowerCase() };
+    console.log('Checking user existence with query:', query);
+
+    const user = await User.findOne(query);
+    console.log('Raw existence check result:', user);
+
+    return !!user;
   }
 }
 

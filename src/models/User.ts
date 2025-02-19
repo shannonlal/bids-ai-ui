@@ -10,8 +10,9 @@ export interface IUserDocument extends Document {
   password: string;
   firstName: string;
   lastName: string;
-  createdAt: string; // Changed to string to match DB
-  updatedAt: string; // Changed to string to match DB
+  role: 'user' | 'admin';
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -39,6 +40,12 @@ const userSchema = new Schema<IUserDocument>(
       type: String,
       required: true,
       trim: true,
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+      required: true,
     },
     createdAt: {
       type: String,
@@ -70,7 +77,8 @@ export function mapUserToDTO(user: IUserDocument): UserType {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    createdAt: user.createdAt, // Already a string
-    updatedAt: user.updatedAt, // Already a string
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
   };
 }

@@ -1,166 +1,188 @@
-# Example: Unit Test for answerService.ts (Comprehensive Test Suite)
+# Comprehensive Answer Service Unit Testing Guide
 
-This example demonstrates a comprehensive unit test suite for the `answerService.ts` file. It includes tests for various functions and scenarios, showcasing how to mock dependencies, test different cases, and use assertions effectively.
+## Overview
+
+This document provides an advanced example of unit testing for an answer service, demonstrating robust testing strategies, error handling, and comprehensive coverage.
+
+## Key Testing Principles
+
+### 1. Comprehensive Test Coverage
+
+- Test successful scenarios
+- Cover error and edge cases
+- Validate input handling
+- Ensure robust error responses
+
+### 2. Mocking Strategies
 
 ```typescript
-import { describe, expect, it, beforeEach, vi } from 'vitest';
-import mongoose from 'mongoose';
-import { Answer, IAnswerDocument } from '../../models/Answer';
-import { answerService } from '../answerService';
+// Effective dependency mocking
+vi.mock('../../lib/openai', () => ({
+  __esModule: true,
+  default: vi.fn().mockResolvedValue({
+    generateAnswer: vi.fn().mockResolvedValue('Mocked AI response'),
+  }),
+}));
 
-// Mock MongoDB connection
+// Mock external dependencies
 vi.mock('../../lib/mongodb', () => ({
   __esModule: true,
   default: vi.fn().mockResolvedValue(mongoose),
 }));
+```
 
-describe('AnswerService', () => {
-  const mockEmail = 'test@example.com';
-  const mockStoryId = new mongoose.Types.ObjectId().toString();
-  const mockQuestion = 'What is the capital of France?';
-  const mockAnswer = 'Paris';
-  const mockScore = 5;
-  const mockCorrection = 'Correct!';
-  const mockSuggestedAnswer = 'The capital of France is Paris.';
+### 3. Error Handling Tests
 
-  const mockAnswerDoc: Partial<IAnswerDocument> = {
-    _id: new mongoose.Types.ObjectId(),
-    userEmail: mockEmail.toLowerCase(),
-    storyId: new mongoose.Types.ObjectId(mockStoryId),
-    question: mockQuestion,
-    answer: mockAnswer,
-    score: mockScore,
-    correction: mockCorrection,
-    suggestedAnswer: mockSuggestedAnswer,
-    createdAt: '2024-01-29T12:00:00.000Z',
-    updatedAt: '2024-01-29T12:00:00.000Z',
-  };
+```typescript
+describe('Error Scenarios', () => {
+  it('should handle OpenAI API errors', async () => {
+    vi.mocked(openai.generateAnswer).mockRejectedValue(new Error('OpenAI API connection failed'));
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+    await expect(
+      answerService.generateAnswer({
+        question: 'Test question',
+        context: 'Test context',
+      })
+    ).rejects.toThrow(ExternalAPIError);
   });
 
-  describe('saveAnswer', () => {
-    it('should save a new answer and return DTO', async () => {
-      const saveMock = vi.fn().mockResolvedValueOnce(mockAnswerDoc);
-      vi.spyOn(Answer.prototype, 'save').mockImplementationOnce(saveMock);
-
-      const result = await answerService.saveAnswer(
-        mockEmail,
-        mockStoryId,
-        mockQuestion,
-        mockAnswer,
-        mockScore,
-        mockCorrection,
-        mockSuggestedAnswer
-      );
-
-      expect(result).toEqual({
-        id: mockAnswerDoc._id!.toString(),
-        userEmail: mockEmail.toLowerCase(),
-        storyId: mockStoryId,
-        question: mockQuestion,
-        answer: mockAnswer,
-        score: mockScore,
-        correction: mockCorrection,
-        suggestedAnswer: mockSuggestedAnswer,
-        createdAt: mockAnswerDoc.createdAt,
-        updatedAt: mockAnswerDoc.updatedAt,
-      });
-    });
-
-    it('should handle database errors during save', async () => {
-      vi.spyOn(Answer.prototype, 'save').mockRejectedValueOnce(new Error('Database error'));
-
-      await expect(
-        answerService.saveAnswer(
-          mockEmail,
-          mockStoryId,
-          mockQuestion,
-          mockAnswer,
-          mockScore,
-          mockCorrection,
-          mockSuggestedAnswer
-        )
-      ).rejects.toThrow('Database error');
-    });
-  });
-
-  describe('getUserAnswers', () => {
-    it('should retrieve all answers for a user', async () => {
-      const mockAnswers = [mockAnswerDoc, { ...mockAnswerDoc, question: 'Another question?' }];
-      vi.spyOn(Answer, 'find').mockReturnValueOnce({
-        sort: vi.fn().mockResolvedValueOnce(mockAnswers),
-      } as any);
-
-      const results = await answerService.getUserAnswers(mockEmail);
-
-      expect(results).toHaveLength(2);
-      expect(results[0].userEmail).toBe(mockEmail.toLowerCase());
-    });
-
-    it('should return empty array if user has no answers', async () => {
-      vi.spyOn(Answer, 'find').mockReturnValueOnce({
-        sort: vi.fn().mockResolvedValueOnce([]),
-      } as any);
-
-      const results = await answerService.getUserAnswers('nonexistent@example.com');
-      expect(results).toEqual([]);
-    });
-  });
-
-  describe('getAnswersByStory', () => {
-    it('should retrieve all answers for a story', async () => {
-      const mockAnswers = [mockAnswerDoc, { ...mockAnswerDoc, userEmail: 'another@example.com' }];
-      vi.spyOn(Answer, 'find').mockReturnValueOnce({
-        sort: vi.fn().mockResolvedValueOnce(mockAnswers),
-      } as any);
-
-      const results = await answerService.getAnswersByStory(mockStoryId);
-
-      expect(results).toHaveLength(2);
-      results.forEach(result => {
-        expect(result.storyId).toBe(mockStoryId);
-      });
-    });
-
-    it('should return empty array if story has no answers', async () => {
-      vi.spyOn(Answer, 'find').mockReturnValueOnce({
-        sort: vi.fn().mockResolvedValueOnce([]),
-      } as any);
-
-      const results = await answerService.getAnswersByStory('nonexistent-story-id');
-      expect(results).toEqual([]);
-    });
-  });
-
-  describe('getUserAnswersForStory', () => {
-    it('should retrieve all answers for a user and story', async () => {
-      const mockAnswers = [mockAnswerDoc, { ...mockAnswerDoc, question: 'Another question?' }];
-      vi.spyOn(Answer, 'find').mockReturnValueOnce({
-        sort: vi.fn().mockResolvedValueOnce(mockAnswers),
-      } as any);
-
-      const results = await answerService.getUserAnswersForStory(mockEmail, mockStoryId);
-
-      expect(results).toHaveLength(2);
-      results.forEach(result => {
-        expect(result.userEmail).toBe(mockEmail.toLowerCase());
-        expect(result.storyId).toBe(mockStoryId);
-      });
-    });
-
-    it('should return empty array if user has no answers for story', async () => {
-      vi.spyOn(Answer, 'find').mockReturnValueOnce({
-        sort: vi.fn().mockResolvedValueOnce([]),
-      } as any);
-
-      const results = await answerService.getUserAnswersForStory(
-        'nonexistent@example.com',
-        mockStoryId
-      );
-      expect(results).toEqual([]);
-    });
+  it('should validate input parameters', async () => {
+    await expect(
+      answerService.generateAnswer({
+        question: '',
+        context: 'Test context',
+      })
+    ).rejects.toThrow(ValidationError);
   });
 });
 ```
+
+### 4. Input Validation
+
+```typescript
+describe('Input Validation', () => {
+  it('should trim and normalize input', async () => {
+    const result = await answerService.generateAnswer({
+      question: '  How does photosynthesis work?  ',
+      context: 'Detailed scientific explanation',
+    });
+
+    expect(result.question).toBe('How does photosynthesis work?');
+  });
+
+  it('should reject excessively long inputs', async () => {
+    const longQuestion = 'a'.repeat(1001);
+
+    await expect(
+      answerService.generateAnswer({
+        question: longQuestion,
+        context: 'Some context',
+      })
+    ).rejects.toThrow('Input exceeds maximum length');
+  });
+});
+```
+
+### 5. Edge Case Testing
+
+```typescript
+describe('Edge Cases', () => {
+  it('should handle multilingual inputs', async () => {
+    const result = await answerService.generateAnswer({
+      question: "Qu'est-ce que la photosynthèse?",
+      context: 'Explication scientifique détaillée',
+    });
+
+    expect(result).toBeDefined();
+    expect(result.language).toBe('fr');
+  });
+
+  it('should manage empty or minimal context', async () => {
+    const result = await answerService.generateAnswer({
+      question: 'What is the capital of France?',
+      context: '',
+    });
+
+    expect(result.confidence).toBeLessThan(0.5);
+  });
+});
+```
+
+### 6. Performance and Caching
+
+```typescript
+describe('Performance Optimization', () => {
+  it('should cache repeated queries', async () => {
+    const firstQuery = await answerService.generateAnswer({
+      question: 'What is machine learning?',
+      context: 'Detailed AI explanation',
+    });
+
+    const secondQuery = await answerService.generateAnswer({
+      question: 'What is machine learning?',
+      context: 'Detailed AI explanation',
+    });
+
+    expect(firstQuery).toEqual(secondQuery);
+    expect(cacheHitCount).toBe(1);
+  });
+
+  it('should have reasonable response time', async () => {
+    const start = performance.now();
+    await answerService.generateAnswer({
+      question: 'Test performance query',
+      context: 'Performance test context',
+    });
+    const end = performance.now();
+
+    expect(end - start).toBeLessThan(1000); // Less than 1 second
+  });
+});
+```
+
+### 7. Security Considerations
+
+```typescript
+describe('Security Tests', () => {
+  it('should sanitize potentially harmful inputs', async () => {
+    const result = await answerService.generateAnswer({
+      question: '<script>alert("XSS")</script>What is security?',
+      context: 'Cybersecurity explanation',
+    });
+
+    expect(result.question).not.toContain('<script>');
+  });
+
+  it('should prevent information disclosure', async () => {
+    const result = await answerService.generateAnswer({
+      question: 'Retrieve sensitive system information',
+      context: 'Confidential system details',
+    });
+
+    expect(result.content).not.toContain('CONFIDENTIAL');
+  });
+});
+```
+
+## Best Practices
+
+- Use meaningful test descriptions
+- Cover multiple scenarios for each method
+- Mock external dependencies
+- Test both successful and failure paths
+- Validate input sanitization
+- Check error handling
+- Ensure type safety
+
+## Recommended Tools
+
+- Vitest for testing
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for formatting
+
+## Continuous Improvement
+
+- Regularly update tests
+- Review and refactor test cases
+- Stay informed about AI and security best practices

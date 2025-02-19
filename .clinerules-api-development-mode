@@ -9,47 +9,83 @@
 
 2. Testing Requirements:
 
-   - All new API endpoints and services MUST have corresponding unit tests.
-   - Aim for high test coverage to ensure the reliability of APIs.
-   - Use Vitest for writing unit tests and place test files alongside the corresponding source files in `src/pages/api/__tests__` or `src/services/__tests__` directories.
-   - Ensure tests cover various scenarios, including success cases, error cases, and edge cases, as demonstrated in the following examples:
-     - [Unit Test Example for Answer Service](./cline_docs/features/api-development/unit-test-examples/good_answerService.test.md)
-     - [Unit Test Example for User Service](./cline_docs/features/api-development/unit-test-examples/good_userService.test.md)
-   - Follow the testing patterns shown in the examples, including using `describe` and `it` blocks, `vi.mock` for mocking dependencies, and `expect` for assertions.
-   - Prioritize testing error handling and edge cases to ensure API robustness.
-   - All new and existing tests must pass before attempting completion.
-   - When modifying existing APIs, update or add tests as needed to reflect the changes and maintain test coverage.
+   - All new API endpoints and services MUST have comprehensive unit tests.
+   - Aim for high test coverage (>90%) to ensure the reliability of APIs.
+   - Use Vitest for writing unit tests and place test files alongside the corresponding source files.
+   - Test Coverage Criteria:
+     - Success scenarios
+     - Error scenarios
+     - Edge cases
+     - Input validation
+     - Boundary conditions
 
-3. API Design Best Practices:
+3. Error Handling and Validation:
 
-   - Follow RESTful API design principles.
-   - Use clear and concise endpoint names and HTTP methods.
-   - Implement proper input validation and sanitization to prevent security vulnerabilities.
-   - Implement robust error handling and return informative error responses to the client.
-   - Design APIs for optimal performance and scalability.
-   - Document API endpoints, request/response formats, and authentication/authorization mechanisms using comments or dedicated documentation files.
+   - Implement robust error handling in all API endpoints and services
+   - Create custom error classes for different error types
+   - Validate and sanitize all input data
+   - Return consistent, informative error responses
+   - Include error codes and descriptive messages
+   - Prevent potential security vulnerabilities through thorough input validation
 
-4. MongoDB Integration:
+4. API Design Best Practices:
 
-   - Use Mongoose models to interact with MongoDB. Define schemas that accurately represent the data structure and relationships.
-   - Optimize database queries for performance. Use indexing strategy and aggregation pipelines where appropriate.
-   - Implement connection pooling and error handling for MongoDB interactions.
+   - Follow RESTful API design principles
+   - Use clear, descriptive endpoint names and HTTP methods
+   - Implement proper input validation and sanitization
+   - Design for performance, scalability, and security
+   - Document API endpoints, request/response formats, and authentication mechanisms
 
-5. External API Integration:
+5. Mocking and Testing Strategies:
 
-   - Document the purpose, usage, and authentication methods of any external APIs used in the code.
-   - Handle API responses and errors appropriately. Implement retry mechanisms and fallback strategies for unreliable external APIs.
-   - Transform and map external API data to the Bids AI platform's data models and formats as needed.
+   - Use comprehensive mocking for external dependencies
+   - Create mock data factories for consistent test data generation
+   - Test both happy paths and error scenarios
+   - Ensure tests cover various input conditions and potential failure modes
 
-6. Code Organization and Style:
+6. Security Considerations:
 
-   - Maintain the existing directory structure of the `bids-ai` project. Group related files logically within appropriate directories.
-   - Keep API route handlers lean and focused on request/response handling. Move business logic and data access code to service layers.
-   - Organize models and types in dedicated directories (`src/models/`, `src/types/`).
-   - Follow consistent naming conventions for routes, functions, variables, and models.
-   - Write clean, well-commented, and maintainable code.
+   - Implement strong input validation
+   - Use environment-based configuration for security settings
+   - Add rate limiting for sensitive endpoints
+   - Protect against common security vulnerabilities
+   - Sanitize and validate all user inputs
 
-7. Security:
-   - Handle API keys and authentication tokens securely. Do not hardcode sensitive information in the codebase. Use environment variables to manage API keys and secrets.
-   - Implement proper authorization and authentication mechanisms for protected API routes, especially for routes that handle sensitive data or modify data.
-   - Sanitize user inputs to prevent common security vulnerabilities such as injection attacks.
+7. Code Organization:
+
+   - Keep route handlers lean and focused
+   - Move complex logic to service layers
+   - Maintain clean, well-commented, and modular code
+   - Follow consistent naming conventions
+   - Organize related files logically
+
+8. Performance and Optimization:
+
+   - Optimize database queries
+   - Implement efficient error handling
+   - Use indexing and aggregation strategies
+   - Minimize unnecessary computations
+   - Consider caching strategies for frequently accessed data
+
+9. Continuous Improvement:
+   - Regularly review and refactor code
+   - Update tests to maintain high coverage
+   - Stay informed about best practices and security updates
+   - Conduct code reviews to ensure quality and consistency
+
+Example Test Coverage Checklist:
+
+- [x] Successful operations
+- [x] Error scenarios
+- [x] Input validation
+- [x] Edge cases
+- [x] Boundary conditions
+- [x] Security checks
+- [x] Performance considerations
+
+Recommended Tools:
+
+- Vitest for unit testing
+- ESLint for code quality
+- Prettier for code formatting
+- TypeScript for type safety
