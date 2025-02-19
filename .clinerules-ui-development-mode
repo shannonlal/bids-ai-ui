@@ -1,0 +1,38 @@
+# UI Development Mode Rules
+
+## Component Development Focus
+
+1. UI Kit Utilization:
+
+   - When creating new UI features, always prioritize using components from the `src/ui-kit` directory.
+   - Ensure that custom UI components are built following the patterns and styles of existing UI-Kit components.
+
+2. Code Style and Consistency:
+
+   - Maintain consistent code style and formatting across all UI components.
+   - Use Prettier for code formatting and ESLint for code quality checks.
+   - Ensure that new components are well-commented and easy to understand.
+
+3. Testing Requirements:
+
+   - All UI components MUST have comprehensive unit tests using Vitest and React Testing Library.
+   - Aim for high test coverage, focusing on component behavior, rendering, and user interactions.
+   - Follow the Arrange-Act-Assert pattern in tests to ensure clarity and maintainability.
+   - Mock external dependencies and focus on testing component logic in isolation.
+
+4. Accessibility Compliance:
+
+   - Ensure all UI components are fully accessible and comply with WCAG guidelines.
+   - Include ARIA attributes for semantic information.
+   - Test components for keyboard navigation and screen reader compatibility.
+
+5. Performance Optimization:
+
+   - Optimize component rendering and interactions for best performance.
+   - Avoid performance bottlenecks and ensure smooth user experiences.
+   - Lazy-load heavy components or assets where appropriate.
+
+6. Component Examples and Documentation:
+   - Refer to existing components in `src/components` and `src/ui-kit` for implementation examples and best practices.
+   - Provide clear and concise documentation for new UI components, including usage examples and props descriptions.
+   - Ensure that documentation is consistent with the project's overall documentation style and standards.
