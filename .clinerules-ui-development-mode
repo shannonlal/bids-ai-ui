@@ -36,3 +36,9 @@
    - Refer to existing components in `src/components` and `src/ui-kit` for implementation examples and best practices.
    - Provide clear and concise documentation for new UI components, including usage examples and props descriptions.
    - Ensure that documentation is consistent with the project's overall documentation style and standards.
+
+## Examples
+
+Please refer to the following file for instructions on How to implement a feature with unit test tests
+
+cline_docs/features/ui-development/good_ui_feature.md
