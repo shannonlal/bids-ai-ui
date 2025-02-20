@@ -146,6 +146,175 @@ Comprehensive API routes for user management:
    - Monitor password resets
    - Track account creations and deletions
 
+## UI Implementation Details
+
+### 1. UI Component Breakdown
+
+#### a) Profile Management Components (src/components/profile/)
+
+**ProfileView.tsx**:
+
+- Purpose: Displays the user's profile information in a read-only format
+- Components Used:
+  - Layout (existing, for page structure)
+  - Header (existing, for navigation)
+  - ProfileComponent (existing, refactor for reusability)
+- Functionality:
+  - Fetches user profile data using useProfile hook
+  - Displays email, first name, last name, and potentially role
+  - "Edit Profile" button to switch to ProfileEditForm
+
+**ProfileEditForm.tsx**:
+
+- Purpose: Form for editing user profile information
+- Components Used:
+  - TextInput (existing UI Kit) for first name and last name
+  - Button (existing UI Kit) for "Save Changes" and "Cancel"
+- Functionality:
+  - Controlled form with TextInput for first and last name
+  - "Save Changes" button triggers profile update
+  - "Cancel" button reverts to ProfileView
+  - Input validation
+  - Display success/error messages
+
+#### b) User Listing and Management Components (src/components/admin/users/)
+
+**UserListView.tsx**:
+
+- Purpose: Displays a list of users for administrators to manage
+- Components Used:
+  - Layout (existing)
+  - Header (existing)
+  - Table component (GradeLevelsTable or custom UsersTable)
+  - Button (existing UI Kit) for actions
+- Functionality:
+  - Fetches all users using userService.getAllUsers
+  - Displays users in a table format
+  - "Edit User" and "Delete User" buttons
+  - Pagination support
+
+**UserEditPage.tsx**:
+
+- Purpose: Page for editing a specific user's details by an administrator
+- Components Used:
+  - Layout (existing)
+  - Header (existing)
+  - UserEditForm (new component)
+- Functionality:
+  - Fetches user data based on route parameter
+  - Handles navigation and page structure
+
+**UserEditForm.tsx**:
+
+- Purpose: Form for editing user details
+- Components Used:
+  - TextInput (existing UI Kit)
+  - Dropdown or Radio (existing UI Kit) for Role selection
+  - Button (existing UI Kit) for "Save Changes" and "Cancel"
+- Functionality:
+  - Controlled form with user detail inputs
+  - "Save Changes" button triggers user update
+  - "Cancel" button navigates back to UserListView
+  - Input validation
+  - Display success/error messages
+
+#### c) User Creation Components
+
+**UserCreatePage.tsx**:
+
+- Purpose: Page for creating a new user by an administrator
+- Components Used:
+  - Layout (existing)
+  - Header (existing)
+  - UserCreateForm (new component)
+- Functionality:
+  - Page to host the UserCreateForm
+  - Handles navigation and page structure
+
+**UserCreateForm.tsx**:
+
+- Purpose: Form for creating a new user
+- Components Used:
+  - TextInput (existing UI Kit) for email, first name, last name, password
+  - Dropdown or Radio (existing UI Kit) for Role selection
+  - Button (existing UI Kit) for "Create User" and "Cancel"
+- Functionality:
+  - Controlled form with all user creation fields
+  - "Create User" button triggers user creation
+  - "Cancel" button navigates back to UserListView
+  - Input validation
+  - Display success/error messages
+
+#### d) Password Reset Components
+
+**PasswordResetRequestForm.tsx**:
+
+- Purpose: Form to request a password reset
+- Components Used:
+  - TextInput (existing UI Kit) for email input
+  - Button (existing UI Kit) for "Reset Password"
+- Functionality:
+  - Controlled form with email input
+  - "Reset Password" button triggers password reset request
+  - Input validation
+  - Display success/error messages
+
+**PasswordResetForm.tsx**:
+
+- Purpose: Form to set a new password after receiving a reset link
+- Components Used:
+  - TextInput (existing UI Kit) for new password and confirm password
+  - Button (existing UI Kit) for "Set New Password"
+- Functionality:
+  - Controlled form with new password inputs
+  - "Set New Password" button triggers password reset
+  - Password matching and strength validation
+  - Display success/error messages
+
+### 2. Page Structure
+
+- Profile Page: `src/pages/profile.tsx`
+- Admin User Management Pages: `src/pages/admin/users/`
+  - `index.tsx`: UserListView
+  - `create.tsx`: UserCreatePage
+  - `[id].tsx`: UserEditPage
+- Password Reset Pages: `src/pages/reset-password/`
+  - `request.tsx`: PasswordResetRequestForm
+  - `[id].tsx`: PasswordResetForm
+
+### 3. State Management
+
+- useProfile Hook: Continue using for fetching and updating the current user's profile
+- Component State: Manage form input values and validation errors using useState
+- Optional Future Enhancement: UserContext for broader authentication state management
+
+### 4. Frontend Unit Testing Strategy
+
+- Testing Library: @testing-library/react
+- Vitest: Test runner
+- Test File Colocation: Keep test files in the same directory as components
+- Test Scenarios:
+  - Rendering
+  - User Interactions
+  - State Transitions
+  - Error Handling
+  - Loading States
+  - Input Validation
+
+### 5. Security Considerations in UI
+
+- Input Sanitization
+- Secure Password Handling
+- HTTPS
+- Appropriate Error Messages
+
+### 6. Development Workflow & Estimation
+
+- Iterative Development
+- Testing First/Alongside Development
+- Code Reviews
+- Estimated Development Time: 16-25 days
+
 ## Conclusion
 
 This comprehensive user management system provides a robust, secure, and extensible approach to handling user authentication and profile management. The modular design allows for easy future enhancements and integration with additional authentication strategies.
